@@ -39,8 +39,7 @@ export const handleSetDomainDefaults = function (data) {
 			self.pao.pa_wiLog(`DOMAIN IS STATIC", ${dumain}`);
 			self.pao.pa_wiLog(`DOCUMENT ROOT", ${self.system?.DOCUMENT_ROOT}`);
 			self.pao.pa_wiLog(
-				"JOINED PATH",
-				path.join(self.system?.DOCUMENT_ROOT, dumain.set),
+				`JOINED PATH : ${path.join(self.system?.DOCUMENT_ROOT, dumain.set)}`,
 			);
 			return data.app.use(
 				data.xpress.static(path.join(self.system?.DOCUMENT_ROOT, dumain.set)),
