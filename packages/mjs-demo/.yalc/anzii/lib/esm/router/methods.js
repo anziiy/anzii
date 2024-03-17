@@ -120,8 +120,8 @@ export const attachRoutes = function (data) {
 		// 	return res.status(200);
 		// });
 
-		// data.router.use(self.outOfRouterContext.bind(this));
-		data.app.get("/*", self.outOfRouterContext.bind(this));
+		data.router.use(self.outOfRouterContext.bind(this));
+		// data.app.get("/*", self.outOfRouterContext.bind(this));
 		aliasList.length > 0
 			? self.emit({
 					type: "router-alias-list",
@@ -228,25 +228,25 @@ export const outOfRouterContext = async function (req, res) {
 	self.infoSync("Handling out of context route");
 	self.infoSync(req.originalUrl);
 	self.adLog("THE OUTOFROUTERCONTEXT REQUESTS");
-	let folderPatH = `${self.pao.pa_getWorkingFolder()}${self.path.sep}build${
-		self.path.sep
-	}index.html`;
+	// let folderPatH = `${self.pao.pa_getWorkingFolder()}${self.path.sep}build${
+	// 	self.path.sep
+	// }index.html`;
 
-	data = {
-		error: false,
-		accepts: "html",
-		type: "StaticServe",
-		code: 200,
-		sendFile: true,
-		fileSource: folderPatH,
-	};
-	if (self) {
-		return res.sendFile(folderPatH);
-		// return self.emit({
-		// 	type: "write-server-request-response",
-		// 	data: { data: data, res: res },
-		// });
-	}
+	// data = {
+	// 	error: false,
+	// 	accepts: "html",
+	// 	type: "StaticServe",
+	// 	code: 200,
+	// 	sendFile: true,
+	// 	fileSource: folderPatH,
+	// };
+	// if (self) {
+	// 	return res.sendFile(folderPatH);
+	// 	// return self.emit({
+	// 	// 	type: "write-server-request-response",
+	// 	// 	data: { data: data, res: res },
+	// 	// });
+	// }
 
 	// self.logSync(req.is)
 	// self.logSync(req.get)
@@ -264,17 +264,17 @@ export const outOfRouterContext = async function (req, res) {
 			fileSource: folderPath,
 		};
 	} else if (req.accepts(["html", "json"]) === "html") {
-		console.log("REQUEST ACCEPTS IN HTML", req.accepts(["html", "json"]));
-		let folderPath = `${self.pao.pa_getWorkingFolder()}${self.path.sep}views${
-			self.path.sep
-		}index.html`;
-		self.pao.pa_wiLog(`folder path: ${folderPath}`);
-		self.pao.pa_wiLog(`working folder: ${self.pao.pa_getWorkingFolder()}`);
-		self.pao.pa_wiLog(
-			`IS EXISTING FOLDER VIEWS: ${self.pao.pa_isExistingDir(
-				folderPath.trim(),
-			)}`,
-		);
+		// console.log("REQUEST ACCEPTS IN HTML", req.accepts(["html", "json"]));
+		// let folderPath = `${self.pao.pa_getWorkingFolder()}${self.path.sep}views${
+		// 	self.path.sep
+		// }index.html`;
+		// self.pao.pa_wiLog(`folder path: ${folderPath}`);
+		// self.pao.pa_wiLog(`working folder: ${self.pao.pa_getWorkingFolder()}`);
+		// self.pao.pa_wiLog(
+		// 	`IS EXISTING FOLDER VIEWS: ${self.pao.pa_isExistingDir(
+		// 		folderPath.trim(),
+		// 	)}`,
+		// );
 		// if (self.pao.pa_isExistingDir(folderPath.trim())) {
 		// 	data = {
 		// 		error: false,
@@ -302,7 +302,6 @@ export const outOfRouterContext = async function (req, res) {
 			message: "Resource was not found: OutOfContext",
 		};
 	} else {
-		console.log("THE CONTENTY IS FOR TXT");
 		data = {
 			error: true,
 			accepts: "txt",

@@ -1,6 +1,6 @@
 {
 	"name": "anzii",
-	"version": "6.2.1",
+	"version": "6.0.0",
 	"description": "Anzii is a backend javascript modular and event-driven framework that is simple, quick to learn and build with.",
 	"main": "./dist/index.cjs",
 	"type": "module",
@@ -103,5 +103,5 @@
 	"bugs": {
 		"url": "https://github.com/iiprodakts/anzii/issues"
 	},
-	"yalcSig": "eebf61ddf8a860ee1e11c0d10a5b5273"
+	"yalcSig": "03558e67780d8e4fc15c2b144df8d982"
 }

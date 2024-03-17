@@ -873,9 +873,11 @@ export const p_loadFile = function (filepath) {
 		import(filepath)
 			.then((moduleFound) => {
 				console.log("THE FOUND MODULE", moduleFound);
-				resolve(moduleFound);
+				let foundFileContent = moduleFound?.default || moduleFound;
+				resolve(foundFileContent);
 			})
-			.catch((err) => {
+			.catch((importERR) => {
+				console.log("IMPORT ERROR", importERR);
 				try {
 					const readFile = p_loadFileSync(filepath);
 					this.p_wiLog(`THE READ FILE, ${JSON.stringify(readFile)}`);
