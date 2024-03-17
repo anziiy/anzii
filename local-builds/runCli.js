@@ -163,8 +163,10 @@ if (operationToRun === "tarball") {
 	if (possibleArgs.length > 4) {
 		operations.push(2);
 	}
+	console.log("THE OPERATIONS", operations);
 	operations.forEach((op, i) => {
-		let comm = i == 0 ? versionCommand : possibleArgs[5];
+		let comm = i == 0 ? versionCommand : possibleArgs[4];
+		console.log("THE COMM", comm);
 		npmPublish({
 			...context,
 			publishCommand: comm,
