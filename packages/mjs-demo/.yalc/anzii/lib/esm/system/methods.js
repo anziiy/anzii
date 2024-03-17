@@ -92,7 +92,7 @@ export const shutDown = function (type, code) {
 };
 export const masterWorker = function (app) {
 	const self = this;
-	console.log("ENV PORT", self?.context?.env?.PORT);
+	// console.log("ENV PORT", self?.context?.env?.PORT);
 	const serverTimeout = self.serverTimeout;
 	const portToUse = self?.context?.env?.PORT ? self?.context?.env?.PORT : 3000;
 	const shouldOpenBrowser = self?.context?.env?.ANZII_OPEN_BROWSER
@@ -212,8 +212,8 @@ export const masterWorker = function (app) {
 				});
 
 				serv.timeout = serverTimeout;
-				self.infoSync("THE TIMEOUT VALUE");
-				self.infoSync(serv.timeout);
+				// self.infoSync("THE TIMEOUT VALUE");
+				// self.infoSync(serv.timeout);
 				setTimeout(function () {
 					if (shouldStopServer) {
 						console.log("CLOSING SERVER");

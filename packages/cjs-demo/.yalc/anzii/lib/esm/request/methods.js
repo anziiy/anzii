@@ -13,8 +13,8 @@ export const init = function () {
 };
 export const handleConfigRequest = function (data) {
 	const self = this;
-	self.infoSync("handleRequest Data;;;");
-	self.infoSync(data);
+	// self.infoSync("handleRequest Data;;;");
+	// self.infoSync(data);
 	data.forEach((route) => {
 		route.view ? self.views.push(route.path) : "";
 	});
@@ -69,7 +69,7 @@ export const handleRequestHandOver = function (data) {
 		self.pao.pa_wiLog("none view should be rendered");
 		return self.emit({ type: "request-global-request", data: handler });
 	} else {
-		console.log("THERE IS NOT HANDLER", self.views);
+		// console.log("THERE IS NOT HANDLER", self.views);
 		self.pao.pa_wiLog("THEre is no handler");
 		self.pao.pa_wiLog(self.handler);
 		if (!self.views || self.views.length === 0) return self.handlePathError();

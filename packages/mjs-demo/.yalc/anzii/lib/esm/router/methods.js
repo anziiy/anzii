@@ -23,7 +23,7 @@ export const handleAttachRoutes = function (data) {
 };
 export const attachRoutes = function (data) {
 	const self = this;
-	console.log("ATTACHING ROUTES", data);
+
 	if (data.app) {
 		let aliasList = [];
 		let aliatikHandlers = [];
@@ -134,7 +134,7 @@ export const attachRoutes = function (data) {
 export const renderRoute = function (r) {
 	const self = this;
 	const pao = this.pao;
-	console.log("ATTACHING ROUTES: RENDER ROUTE", self.routerMiddleware, r.type);
+
 	let routy = {
 		router: r.router,
 		method: r.method,
@@ -188,7 +188,7 @@ export const appendRouter = function (r) {
 		// self.infoSync(r.path)
 		// self.infoSync(r.middleware)
 		// self.infoSync(r.handOver)
-		console.log("THE ROUTER BEING CONFIGURED", r);
+
 		r.router[r.method.toLowerCase()](
 			r.path,
 			r.middleware,
@@ -252,7 +252,7 @@ export const outOfRouterContext = async function (req, res) {
 	// self.logSync(req.get)
 	// self.logSync(req.is('text'))
 	self.adLog(req.accepts(["html", "json"]));
-	console.log("THE ACCEPTED WITH TYPE", req.get("Content-Type"));
+
 	// self.logSync(req.accepts())
 	if (req.accepts(["html", "json"]) === "json") {
 		data = {
@@ -317,7 +317,7 @@ export const outOfRouterContext = async function (req, res) {
 };
 export async function handOver(req, res, next) {
 	const self = this;
-	console.log("HANDOVER IS IN ACTION");
+
 	await self.pao.pa_wiLog("THE CAUGHT REQUEST INSIDE ROUTER::END POINT HIT");
 	self.infoSync(next);
 	let reqresID = self.pao.pa_generateUniqueID();

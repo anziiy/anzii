@@ -13,8 +13,8 @@ export const init = function () {
 };
 export const handleConfigRequest = function (data) {
 	const self = this;
-	self.infoSync("handleRequest Data;;;");
-	self.infoSync(data);
+	// self.infoSync("handleRequest Data;;;");
+	// self.infoSync(data);
 	data.forEach((route) => {
 		route.view ? self.views.push(route.path) : "";
 	});

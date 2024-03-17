@@ -12,7 +12,7 @@ export const handleSetDomainDefaults = function (data) {
 	const passport = self.passport;
 
 	const path = self.path;
-	self.infoSync("SETTING DOMAIN DEFAULTS");
+	// self.infoSync("SETTING DOMAIN DEFAULTS");
 	self.pao.pa_wiLog(`Domain resources data, ${data}`);
 	self.pao.pa_wiLog(`THE DOMAINS, ${domains}`);
 	self.pao.pa_wiLog(`THE DOMAINS PASSPORT, ${passport}`);
