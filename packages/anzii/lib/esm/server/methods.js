@@ -243,7 +243,11 @@ export const getHtml = function (res, view) {
 	self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
-		view.viewData ? (viewda = view.viewData) : (viewda = { title: view.title });
+		let serviceUrl = process?.env?.appEndpoint || "http://localhost:3000";
+		view.viewData
+			? (viewda = { ...view.viewData, serviceUrl })
+			: (viewda = { title: view.title, serviceUrl });
+		console.log("THE VIEWDA", viewda);
 		res.render(view.view, viewda, (err, html) => {
 			if (err) {
 				self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");
