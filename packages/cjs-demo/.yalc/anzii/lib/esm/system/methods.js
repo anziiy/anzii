@@ -299,9 +299,16 @@ export const getServerPort = function (port = 3000) {
 		self
 			.detectPort(port)
 			.then((gotPort) => {
-				if (gotPort === port) {
+				console.log("THE GOT PORT", gotPort);
+				console.log("THE CHECKED PORT", port);
+				console.log("THE TYPEOF PORT", typeof port);
+				console.log("THE TYPEOF GOT PORT", typeof gotPort.toString());
+				console.log("THE GOT PORT EQUALS PORT", gotPort === port);
+
+				if (gotPort.toString() === port) {
 					resolve(gotPort);
 				} else {
+					console.log("SEARCHING FOR OPEN PORT");
 					self.portFinder
 						.getPortPromise()
 						.then((openPort) => {
