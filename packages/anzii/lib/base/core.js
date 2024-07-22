@@ -171,8 +171,8 @@ CORE.prototype.util = function () {
 		createFolderContent: function (source, target, ignore = null) {
 			return PILLAR.p_createFolderContent(source, target, ignore);
 		},
-		loadFile: function (filepath) {
-			return PILLAR.p_loadFile(filepath);
+		loadFile: function (filepath, all = false, checkExist = true) {
+			return PILLAR.p_loadFile(filepath, all, checkExist);
 		},
 		loadFileSync: function (filepath) {
 			return PILLAR.p_loadFileSync(filepath);

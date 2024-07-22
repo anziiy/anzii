@@ -873,8 +873,12 @@ export const p_loadFile = function (filepath, all = false, checkExist = true) {
 		import(filepath)
 			.then((moduleFound) => {
 				// console.log("THE FOUND MODULE", moduleFound);
-				let foundFileContent = moduleFound?.default || moduleFound;
+				// let foundFileContent = moduleFound?.default || moduleFound;
+				let foundFileContent = all
+					? moduleFound
+					: moduleFound?.default || moduleFound;
 				resolve(foundFileContent);
+				// resolve(foundFileContent);
 			})
 			.catch((importERR) => {
 				// console.log("IMPORT ERROR", importERR);
