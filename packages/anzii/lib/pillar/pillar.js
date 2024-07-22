@@ -831,10 +831,10 @@ export const p_createFolderContent = function (
 		}
 	});
 };
-export const p_loadFile = function (filepath) {
+export const p_loadFile = function (filepath, all = false, checkExist = true) {
 	return new Promise((resolve, reject) => {
 		this.p_wiLog(`THE FILEPATH load,${filepath}`);
-		if (!p_isExistingDir(filepath))
+		if (checkExist && !p_isExistingDir(filepath))
 			return reject({
 				code: "FILE_PATH_ERROR",
 				message: "File path does not exist",
