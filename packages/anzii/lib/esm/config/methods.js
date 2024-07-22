@@ -246,16 +246,29 @@ export const runAppConfig = function (manualConfig = null) {
 			self.pao.pa_wiLog("The module in Config");
 			self.pao.pa_wiLog(c);
 			if (c === "server") isServerConfig = true;
-			c === "router"
-				? config.views
-					? (self.emit({ type: "config-request", data: config[c] }),
-					  self.emit({
-							type: "config-view",
-							data: { routes: config[c], handlers: config.views },
-					  }))
-					: (self.emit({ type: "config-request", data: config[c] }),
-					  self.emit({ type: "config-view", data: config[c] }))
-				: "";
+			if (c === "router") {
+				if (config.views) {
+					self.emit({ type: "config-request", data: config[c] });
+					self.emit({
+						type: "config-view",
+						data: { routes: config[c], handlers: config.views },
+					});
+					self.emit({
+						type: "take-ssr-routes",
+						data: { payload: { routes: config[c] } },
+					});
+				} else {
+					self.emit({ type: "config-request", data: config[c] });
+					self.emit({
+						type: "config-view",
+						data: { routes: config[c], handlers: config.views },
+					});
+					self.emit({
+						type: "take-ssr-routes",
+						data: { payload: { routes: config[c] } },
+					});
+				}
+			}
 			if (c !== "logger" || c !== "views") {
 				self.emit({
 					type: `config-${c}`,
