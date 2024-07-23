@@ -143,7 +143,7 @@ export const enviroment = function () {
 };
 export const handleManualConfig = function (data = null) {
 	const self = this;
-	self.pao.pa_wiLog.log(
+	self.pao.pa_wiLog(
 		`MANUAL SERVER TRIGGER ACTIVATED,
 		${data?.payload?.configs}`,
 	);
@@ -164,11 +164,11 @@ export const runAppConfig = function (manualConfig = null) {
 		let { compiler, wepackMiddlewares, webpackConfig } = payload;
 		const { webpackDevMiddleware, webpackHotMiddleware } = wepackMiddlewares;
 
-		self.pao.pa_wiLog("THE CONFIG");
-		self.pao.pa_wiLog(JSON.stringify(config));
-		self.pao.pa_wiLog(`runAPPcoNFIG", ${JSON.stringify(manualConfig)}`);
-		self.pao.pa_wiLog(`THE APP CONFIG", ${JSON.stringify(self.config)}`);
-		self.pao.pa_wiLog(`THE COMPILEr", ${manualConfig?.payload?.webpackConfig}`);
+		// self.pao.pa_wiLog("THE CONFIG");
+		// self.pao.pa_wiLog(JSON.stringify(config));
+		// self.pao.pa_wiLog(`runAPPcoNFIG", ${JSON.stringify(manualConfig)}`);
+		// self.pao.pa_wiLog(`THE APP CONFIG", ${JSON.stringify(self.config)}`);
+		// self.pao.pa_wiLog(`THE COMPILEr", ${manualConfig?.payload?.webpackConfig}`);
 
 		/* The code immediately after this comment should be re-organized 
       it's just using a quick dirty approach to test some logic
@@ -282,13 +282,12 @@ export const runAppConfig = function (manualConfig = null) {
 
 		self.emit({ type: "config-domain-resources", data: null }); // to be re-organized
 		self.pao.pa_wiLog(`isServer Value", ${isServerConfig}`);
-		// if (!isServerConfig) {
-
-		// 	self.emit({
-		// 		type: `config-server`,
-		// 		data: `server`,
-		// 	}); // TO be re-organized
-		// }
+		if (!isServerConfig) {
+			self.emit({
+				type: `config-server`,
+				data: `server`,
+			}); // TO be re-organized
+		}
 	}
 
 	// const theWatcher = manualConfig?.payload?.compiler.watch(
