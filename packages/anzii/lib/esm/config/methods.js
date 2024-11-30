@@ -66,11 +66,18 @@ export const configure = function () {
 	const isAnziiCliWithServer =
 		anziiCliWithServer && anziiCliWithServer === "true" ? true : false;
 	const initializeCliWithServer = isAppCli && isAnziiCliWithServer;
+	const anziiKickoffManually = process.env?.ANZII_KICK_OFF_MANUALLY;
+	const isAnziiInitiateManually =
+		(anziiKickoffManually && anziiKickoffManually === "true") || null;
 
 	self.pao.pa_wiLog(`THE CONFIG IS APP CLI: ${isAppCli}`);
 	self.pao.pa_wiLog(`THE CONFIG initi ${initializeCliWithServer}`);
 
-	if (initializeCliWithServer) return self.configLogger();
+	if (initializeCliWithServer || (isAnziiInitiateManually && !self.config)) {
+		self.configLogger();
+		return self.configReady();
+	}
+
 	self.configLogger();
 	self.runAppConfig();
 };
@@ -147,7 +154,10 @@ export const handleManualConfig = function (data = null) {
 		`MANUAL SERVER TRIGGER ACTIVATED,
 		${data?.payload?.configs}`,
 	);
-	// if()
+	if (data?.payload?.customKickOff) {
+		self.config = data?.payload?.config;
+		return self.runAppConfig();
+	}
 	self.runAppConfig(data);
 };
 export const runAppConfig = function (manualConfig = null) {
@@ -212,16 +222,6 @@ export const runAppConfig = function (manualConfig = null) {
 		};
 	}
 
-	//if (dumain.name === "webpackDevMiddleware")
-	//     return data.app.use(dumain.use(data.custom.compiler, {
-	//         publicPath: data.custom.webpackConfig.output.path,
-	//         writeToDisk: true
-	//     }));
-	// if (dumain.name === "webpackHotMiddleware")
-	//     return data.app.use(dumain.use(data.custom.compiler));
-
-	// self.pao.pa_wiLog('THE VALUE OF CONFIG SELF.CONFIG')
-	// self.pao.pa_wiLog(self.config)
 	if (!self.config) {
 		self.emit({ type: "config-system", data: { workers: 1, spawn: true } });
 		// if (manualConfig)
@@ -341,6 +341,15 @@ export const doBefore = function () {
 	// const packageJSON =  fs.readFileSync('./package.json');
 	// console.log("The package.json",packageJSON)
 	// self.configure()
+};
+export const configReady = function () {
+	const self = this;
+	const pao = self.pao;
+
+	self.emit({
+		type: `config-is-ready`,
+		data: {},
+	});
 };
 export const mergeConfigs = function (configToMerge) {
 	const self = this;
