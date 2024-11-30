@@ -288,10 +288,10 @@ export const iLog = async function (log) {
 	//self.logger.error(`${log.source}: ${log.message}`)
 	// self.pao.pa_wiLog(process.env)
 	// if(process.env.ANZII_SHOW_DEBUG_LOGS && process.env.ANZII_SHOW_DEBUG_LOGS.trim().toLowerCase() === 'true') console.log(log.message)
-	if (!process.env.SHOW_ANZII_WI_LOGS) return;
-	if (process.env.SHOW_ANZII_WI_LOGS.trim().toLowerCase() !== "true") return;
+	if (!process.env.ANZII_SHOW_WILD_LOGS) return;
+	if (process.env.ANZII_SHOW_WILD_LOGS.trim().toLowerCase() !== "true") return;
 	self.pao.pa_wiLog("iLog:ANZIILOGER");
-	self.pao.pa_wiLog(process.env.SHOW_ANZII_WI_LOGS);
+	self.pao.pa_wiLog(process.env.ANZII_SHOW_WILD_LOGS);
 	console.log(log.message);
 	// const self = this
 	// const pao = self.pao
