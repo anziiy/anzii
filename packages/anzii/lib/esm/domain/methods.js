@@ -36,14 +36,16 @@ export const handleSetDomainDefaults = function (data) {
 			self.pao.pa_wiLog(
 				`${path.join(self.system?.DOCUMENT_ROOT)}, ${dumain.set}`,
 			);
-			self.pao.pa_wiLog(`DOMAIN IS STATIC", ${dumain}`);
-			self.pao.pa_wiLog(`DOCUMENT ROOT", ${self.system?.DOCUMENT_ROOT}`);
-			self.pao.pa_wiLog(
-				`JOINED PATH : ${path.join(self.system?.DOCUMENT_ROOT, dumain.set)}`,
-			);
-			return data.app.use(
-				data.xpress.static(path.join(self.system?.DOCUMENT_ROOT, dumain.set)),
-			);
+			let appRoot = self.system?.DOCUMENT_ROOT;
+			let appStaticFull = `${path.join(
+				self.system?.DOCUMENT_ROOT,
+				dumain.set,
+			)}`;
+			console.log("THE APP ROOT", appRoot);
+			console.log("THE APP FULL STATIC", appStaticFull);
+			let domainStatic = dumain?.absolute ? dumain.set : appStaticFull;
+			console.log("THE STATIC DOMAIN", domainStatic);
+			return data.app.use(data.xpress.static(domainStatic));
 		}
 		if (dumain.name === "passport") return data.app.use(passport.initialize());
 		// if (dumain.name === "webpackDevMiddleware")
