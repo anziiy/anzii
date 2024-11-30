@@ -1,4 +1,7 @@
 /* eslint-disable no-unused-vars */
+import async from "async";
+import fs from "node:fs";
+import os from "node:os";
 export const init = function () {
 	this.adLog("System has been initialised");
 	this.listens({
@@ -166,6 +169,9 @@ export const masterWorker = function (app) {
 							`The Server is listening via a worker on port:${availablePort}`,
 						);
 						self.adLog("THIS WORKER RUNNING IP:");
+						self.createCustomDomain().then((result) => {
+							console.log("Domain created", result);
+						});
 
 						if (shouldOpenBrowser) self.openBrowserApp(availablePort);
 
@@ -198,6 +204,9 @@ export const masterWorker = function (app) {
 					);
 					// self.adLog("The Application is listening via workers");
 					// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
+					self.createCustomDomain().then((result) => {
+						console.log("Domain created", result);
+					});
 
 					if (shouldOpenBrowser) self.openBrowserApp(availablePort);
 				});
@@ -327,4 +336,63 @@ export const getServerPort = function (port = 3000) {
 				reject(err);
 			});
 	});
+};
+
+export const getSslCerts = function (pathOrSets) {
+	const self = this;
+	self.infoSync(`User preffered port: ${port}`);
+	return new Promise((resolve, reject) => {});
+};
+
+export const runHttps = function (app, port = 3000) {
+	const self = this;
+	self.infoSync(`User preffered port: ${port}`);
+	return new Promise((resolve, reject) => {});
+};
+
+export const runHttp = function (app, port = 3000) {
+	const self = this;
+	self.infoSync(`User preffered port: ${port}`);
+	return new Promise((resolve, reject) => {});
+};
+
+export const createCustomDomain = function () {
+	const self = this;
+	self.infoSync(`CreateCustomDomain: `);
+	return new Promise((resolve, reject) => {
+		async.waterfall([self.readHostsFile.bind(self)], (err, result) => {
+			console.log("THE WATERALL RESULTS", result);
+			resolve(result);
+		});
+	});
+};
+
+export const readHostsFile = function (next) {
+	const self = this;
+	const operatingSystem = self.getSystemType();
+	let hostsFilePath = null;
+	console.log("THE OPERATING SYSTEM", operatingSystem);
+
+	switch (operatingSystem) {
+		case "darwin":
+			hostsFilePath = "/etc/hosts";
+			break;
+		default:
+			hostsFilePath = "c:windowssystem32driversetchosts";
+	}
+
+	let data = fs.readFileSync(hostsFilePath, { encoding: "utf-8" });
+	console.log("THE HOSTS DATA", data);
+	let newHostEntry = `127.0.0.1 example.com`;
+	data += newHostEntry + "\n";
+	console.log("NEW DATA", data);
+	fs.writeFileSync(hostsFilePath, data);
+	next(null, data);
+
+	// return new Promise((resolve, reject) => {});
+};
+
+export const getSystemType = function () {
+	const self = this;
+	return os.platform();
 };

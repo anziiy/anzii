@@ -36,6 +36,9 @@ class System {
 		this.shutDown = methods.shutDown;
 		this.openBrowserApp = methods.openBrowserApp;
 		this.getServerPort = methods.getServerPort;
+		this.createCustomDomain = methods.createCustomDomain;
+		this.readHostsFile = methods.readHostsFile;
+		this.getSystemType = methods.getSystemType;
 	}
 }
 export default System;
