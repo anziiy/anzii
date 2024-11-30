@@ -211,9 +211,9 @@ export const p_getMainFileName = function () {
 	// ext = filename.slice(nameIndex,filename.length)
 	return null;
 };
-export const p_getRootDir = function () {
+export const p_getRootDir = function (filename = null) {
 	// let filename = __filename;
-	let dir = path.dirname(__filename);
+	let dir = path.dirname(filename || __filename);
 	return dir;
 };
 
@@ -881,7 +881,7 @@ export const p_loadFile = function (filepath, all = false, checkExist = true) {
 				// resolve(foundFileContent);
 			})
 			.catch((importERR) => {
-				// console.log("IMPORT ERROR", importERR);
+				console.log("IMPORT ERROR", importERR);
 				try {
 					const readFile = p_loadFileSync(filepath);
 					this.p_wiLog(`THE READ FILE, ${JSON.stringify(readFile)}`);

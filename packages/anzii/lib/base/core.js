@@ -186,8 +186,8 @@ CORE.prototype.util = function () {
 		getMainFileName: function () {
 			return PILLAR.p_getMainFileName();
 		},
-		getRootDir: function () {
-			return PILLAR.p_getRootDir();
+		getRootDir: function (filename = null) {
+			return PILLAR.p_getRootDir(filename);
 		},
 
 		isExistingDir: function (filepath) {
