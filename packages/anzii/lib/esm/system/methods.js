@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import async from "async";
 import fs from "node:fs";
 import os from "node:os";
+// import openssl from "openssl-nodejs";
 export const init = function () {
 	this.adLog("System has been initialised");
 	this.listens({
@@ -204,9 +204,10 @@ export const masterWorker = function (app) {
 					);
 					// self.adLog("The Application is listening via workers");
 					// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
-					self.createCustomDomain().then((result) => {
-						console.log("Domain created", result);
-					});
+					// self.createCustomDomain().then((result) => {
+					// 	console.log("Domain created", result);
+					// });
+					self.createCustomDomain();
 
 					if (shouldOpenBrowser) self.openBrowserApp(availablePort);
 				});
@@ -292,10 +293,14 @@ export const handleRegisterShutDownCandidate = function (data) {
 		self.pao.pa_wiLog("Candidate could not be registered for shutdown", "warn");
 	}
 };
-export const openBrowserApp = async function (portToOpenTo) {
+export const openBrowserApp = async function (
+	portToOpenTo,
+	protocol = "http",
+	domain = "localhost",
+) {
 	const self = this;
 	const open = self.open;
-	await open(`http://localhost:${portToOpenTo}`);
+	await open(`${protocol}://${domain}:${portToOpenTo}`);
 	// console.log("THE BROWSER OPENED");
 	// const openBrowser = () => import('open').then(({default: open}) => open("http://localhost:3000"));
 	// openBrowser()
@@ -359,12 +364,26 @@ export const runHttp = function (app, port = 3000) {
 export const createCustomDomain = function () {
 	const self = this;
 	self.infoSync(`CreateCustomDomain: `);
-	return new Promise((resolve, reject) => {
-		async.waterfall([self.readHostsFile.bind(self)], (err, result) => {
-			console.log("THE WATERALL RESULTS", result);
-			resolve(result);
-		});
+	self.emit({
+		type: `create-ssl-cert`,
+		data: {
+			payload: { certConfi: true },
+			callback: (fromOpenSSl) => {
+				console.log("THE SSL ", fromOpenSSl);
+			},
+		},
 	});
+
+	// return new Promise((resolve, reject) => {
+
+	// 	// async.waterfall([self.readHostsFile.bind(self)], (err, result) => {
+	// 	// 	console.log("THE WATERALL RESULTS", result);
+	// 	// 	resolve(result);
+	// 	// });
+	// 	// openssl(
+	// 	// 	"openssl req -config csr.cnf -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout key.key -out certificate.crt",
+	// 	// );
+	// });
 };
 
 export const readHostsFile = function (next) {
