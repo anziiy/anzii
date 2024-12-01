@@ -8,6 +8,7 @@ import Global from "./global/index.js";
 import IO from "./io/index.js";
 import Middleware from "./middleware/index.js";
 import Mysql from "./mysql/index.js";
+import OpenSSL from "./openssl/index.js";
 import Parsers from "./parsers/index.js";
 import Request from "./request/index.js";
 import Router from "./router/index.js";
@@ -22,6 +23,7 @@ class Esm {
 			System,
 			Middleware,
 			Parsers,
+			OpenSSL,
 			//DoBefores,
 			Router,
 			Request,
