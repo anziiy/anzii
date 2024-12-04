@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 export const init = function () {
 	console.log("THE OPENSSL has been initialised");
 	this.listens({
-		"create-ssl-cert": this.handleCreateSSLCert.bind(this),
+		"create-ssl-certificate": this.handleCreateSSLCert.bind(this),
 	});
 };
 
@@ -17,63 +17,60 @@ export const init = function () {
 export const handleCreateSSLCert = function (data) {
 	// eslint-disable-next-line no-unused-vars
 	const self = this;
-	const pao = self.pao;
-	const getRootDir = pao.pa_getRootDir;
+	const { config } = data;
 
-	const loadFile = pao.pa_loadFile;
-	let thisFileDir = getRootDir(__filename);
-	loadFile(path.resolve(thisFileDir, "generateConfig_.json")).then(
-		async (sslConfig) => {
-			// console.log("SSL CONFIG", sslConfig);
+	if (!config?.action && !config?.actions) {
+		throw new Error(
+			"Openssl config requires config.action or config.actions to be defined",
+		);
+	}
+	let options = "";
+	if (config?.actions) {
+		let terminalPromises = config.actions.map(async (configItem, loop) => {
+			options = self.runOptions(configItem);
+			console.log("Actions options built string", options);
+			return await runTerminal(`openssl ${options}`, loop);
+		});
 
-			let config = JSON.parse(sslConfig);
-
-			// Throw if no config.action or config.options is not defined in the loaded json config
-			if (!config?.action && !config?.actions) {
-				throw new Error(
-					"Openssl config requires config.action or config.actions to be defined",
-				);
-			}
-			let options = "";
-			if (config?.actions) {
-				let terminalPromises = config.actions.map(async (configItem, loop) => {
-					// console.log("THE CONFIG ITEM", configItem);
-					options = self.runOptions(configItem);
-					console.log("Actions options built string", options);
-					return await runTerminal(`openssl ${options}`, loop);
+		Promise.all(terminalPromises)
+			.then((opensslActionsResults) => {
+				console.log("The promises have finished", opensslActionsResults);
+				data.callback({
+					actionStatus: true,
+					message: "Self-signed certificated greated sucessfully",
 				});
-				// console.log("THE GOT FUNKS", gotFunks);
-				// let loop = 0;
-				// let promises = [];
-				// for (let configItem of config.actions) {
-				// 	console.log("THE CONFIG ITEM", configItem);
-				// 	options = self.runOptions(configItem);
-				// 	console.log("Actions options built string", options);
-				// 	loop += 1;
-
-				// 	promises.push(await runTerminal(`openssl ${options}`, loop));
-				// 	// console.log("THE REZOLVED PROMISE", rezolved);
-				// }
-				Promise.all(terminalPromises)
-					.then((opensslActionsResults) => {
-						console.log("The promises have finished", opensslActionsResults);
-					})
-					.catch((err) => {
-						console.log("SSL KEY CREATION FAILED", err);
-					});
-
-				// async.waterfall([self.readHostsFile.bind(self)], (err, result) => {
-				// 	console.log("THE WATERALL RESULTS", result);
-				// 	resolve(result);
-				// });
-			} else {
-				options = self.runOptions(config);
-				self.runTerminal(`openssl ${options}`).then((outcome) => {
-					console.log("SINGLE ACTION OUTCOME", outcome);
+			})
+			.catch((err) => {
+				console.log("SSL KEY CREATION FAILED", err);
+				data.callback({
+					actionStatus: false,
+					error: err,
+					message: "Certification createion failed",
 				});
-			}
-		},
-	);
+			});
+
+		// async.waterfall([self.readHostsFile.bind(self)], (err, result) => {
+		// 	console.log("THE WATERALL RESULTS", result);
+		// 	resolve(result);
+		// });
+	} else {
+		options = self.runOptions(config);
+		self
+			.runTerminal(`openssl ${options}`)
+			.then((outcome) => {
+				data.callback({
+					actionStatus: true,
+					message: "Self-signed certificated greated sucessfully",
+				});
+			})
+			.catch((err) => {
+				data.callback({
+					actionStatus: false,
+					error: err,
+					message: "Certification createion failed",
+				});
+			});
+	}
 };
 
 /**
