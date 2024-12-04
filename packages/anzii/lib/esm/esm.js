@@ -13,8 +13,10 @@ import Parsers from "./parsers/index.js";
 import Request from "./request/index.js";
 import Router from "./router/index.js";
 import Server from "./server/index.js";
+import SystemHost from "./system-host/index.js";
 import System from "./system/index.js";
 import View from "./view/index.js";
+
 class Esm {
 	constructor() {
 		this.Esm = {
@@ -35,6 +37,7 @@ class Esm {
 			Config,
 			IO,
 			Global,
+			SystemHost,
 		};
 	}
 }
