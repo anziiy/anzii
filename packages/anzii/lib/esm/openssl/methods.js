@@ -17,7 +17,8 @@ export const init = function () {
 export const handleCreateSSLCert = function (data) {
 	// eslint-disable-next-line no-unused-vars
 	const self = this;
-	const { config } = data;
+	const { payload } = data;
+	const { config } = payload;
 	const filesOutputPaths = {};
 
 	if (!config?.action && !config?.actions) {
@@ -30,7 +31,7 @@ export const handleCreateSSLCert = function (data) {
 		let terminalPromises = config.actions.map(async (configItem, loop) => {
 			options = self.runOptions(configItem);
 			console.log("Actions options built string", options);
-			filesOutputPaths[options.ouput.type] = options.output.value;
+			filesOutputPaths[options.output.type] = options.output.value;
 			return await runTerminal(`openssl ${options.commandString}`, loop);
 		});
 
@@ -58,7 +59,7 @@ export const handleCreateSSLCert = function (data) {
 		// });
 	} else {
 		options = self.runOptions(config);
-		filesOutputPaths[options.ouput.type] = options.output.value;
+		filesOutputPaths[options.output.type] = options.output.value;
 		self
 			.runTerminal(`openssl ${options.commandString}`)
 			.then((outcome) => {
@@ -178,7 +179,7 @@ export const runOptions = function (config) {
 		commandString: `${
 			commands[config.action].commandName
 		} ${terminalOptionsFromConfig}`,
-		ouput: fileOutput,
+		output: fileOutput,
 	};
 };
 
