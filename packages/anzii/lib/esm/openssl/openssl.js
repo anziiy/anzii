@@ -8,7 +8,7 @@ class OpenSSL {
 		this.handleCreateSSLCert = methods.handleCreateSSLCert;
 		this.runTerminal = methods.runTerminal;
 		this.runOptions = methods.runOptions;
-		this.getAsyncFunk = methods.getAsyncFunk;
+		this.setActionOutput = methods.setActionOutput;
 	}
 }
 

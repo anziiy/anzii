@@ -18,6 +18,7 @@ export const handleCreateSSLCert = function (data) {
 	// eslint-disable-next-line no-unused-vars
 	const self = this;
 	const { config } = data;
+	const filesOutputPaths = {};
 
 	if (!config?.action && !config?.actions) {
 		throw new Error(
@@ -29,7 +30,8 @@ export const handleCreateSSLCert = function (data) {
 		let terminalPromises = config.actions.map(async (configItem, loop) => {
 			options = self.runOptions(configItem);
 			console.log("Actions options built string", options);
-			return await runTerminal(`openssl ${options}`, loop);
+			filesOutputPaths[options.ouput.type] = options.output.value;
+			return await runTerminal(`openssl ${options.commandString}`, loop);
 		});
 
 		Promise.all(terminalPromises)
@@ -38,6 +40,7 @@ export const handleCreateSSLCert = function (data) {
 				data.callback({
 					actionStatus: true,
 					message: "Self-signed certificated greated sucessfully",
+					filesOutputPaths,
 				});
 			})
 			.catch((err) => {
@@ -55,12 +58,14 @@ export const handleCreateSSLCert = function (data) {
 		// });
 	} else {
 		options = self.runOptions(config);
+		filesOutputPaths[options.ouput.type] = options.output.value;
 		self
-			.runTerminal(`openssl ${options}`)
+			.runTerminal(`openssl ${options.commandString}`)
 			.then((outcome) => {
 				data.callback({
 					actionStatus: true,
-					message: "Self-signed certificated greated sucessfully",
+					message: "Self-signed certificate created sucessfully",
+					filesOutputPaths,
 				});
 			})
 			.catch((err) => {
@@ -110,6 +115,7 @@ export const runOptions = function (config) {
 	let configActionOptions = config.options;
 	let terminalOptionsFromConfig = "";
 	let commandOptionsKeys = Object.keys(command.options); // get command options for the current action
+	let fileOutput = {};
 	// console.log("THE COMMAND", command);
 	// console.log("Command KEYS", commandOptionsKeys);
 
@@ -139,11 +145,23 @@ export const runOptions = function (config) {
 						option == "outputPath"
 					) {
 						if (!path.isAbsolute(option)) {
+							if (option == "outputPath")
+								self.setActionOutput(
+									fileOutput,
+									config.action,
+									path.resolve(process.cwd(), configActionOptions[option]),
+								);
 							terminalOptionsFromConfig += `${
 								commandOption.alias
 							} ${path.resolve(process.cwd(), configActionOptions[option])} `;
 						}
 					} else {
+						if (option == "outputPath")
+							self.setActionOutput(
+								fileOutput,
+								config.action,
+								configActionOptions[option],
+							);
 						terminalOptionsFromConfig += `${commandOption.alias} ${configActionOptions[option]} `;
 					}
 				} else {
@@ -156,7 +174,12 @@ export const runOptions = function (config) {
 	});
 	// console.log("TERMINAL OPTIONS FROM CONFIG", terminalOptionsFromConfig);
 
-	return `${commands[config.action].commandName} ${terminalOptionsFromConfig}`;
+	return {
+		commandString: `${
+			commands[config.action].commandName
+		} ${terminalOptionsFromConfig}`,
+		ouput: fileOutput,
+	};
 };
 
 /**
@@ -165,12 +188,22 @@ export const runOptions = function (config) {
  * runTerminal will take a command string that is made up of the openssl parent command
  *  and its related applicable sub-comands. The sub-commands will have options of their own
  */
-export const getAsyncFunk = function (commandr) {
+export const setActionOutput = function (outputHolder, action, value) {
 	const self = this;
-	return async () => {
-		self.runTerminal(commandr).then((runOutcom) => {
-			console.log("RUN OUTCOME FOR COMMANDR", commandr, "outcome", runOutcom);
-			resolve(runOutcom);
-		});
-	};
+	switch (action) {
+		case "create-self-signed-certificate-request":
+			outputHolder["value"] = value;
+			outputHolder["type"] = "certificate";
+			break;
+		case "create-certificate-signing-request":
+			outputHolder["value"] = value;
+			outputHolder["type"] = "csr";
+			break;
+		case "generate-rsa":
+			outputHolder["value"] = value;
+			outputHolder["type"] = "key";
+			break;
+		default:
+			null;
+	}
 };
