@@ -207,9 +207,16 @@ export const masterWorker = function (app) {
 					// self.createCustomDomain().then((result) => {
 					// 	console.log("Domain created", result);
 					// });
-					self.createCustomDomain();
-
-					if (shouldOpenBrowser) self.openBrowserApp(availablePort);
+					// self.createCustomDomain();
+					let protocol = process.env.ANZII_APP_USE_HTTPS
+						? process.env.ANZII_APP_USE_HTTPS
+						: "http";
+					let domainToUse = process.env?.ANZII_USE_CUSTOM_DOMAIN
+						? process.env?.ANZII_USE_CUSTOM_DOMAIN
+						: "localhost";
+					if (shouldOpenBrowser) {
+						self.openBrowserApp(availablePort, protocol, domainToUse);
+					}
 				});
 				process.on("message", function (message) {
 					self.pao.pa_wiLog(
