@@ -182,82 +182,36 @@ export const masterWorker = function (app, appOpts) {
 					});
 				} else {
 					self.adLog("System is running on a single thread/core");
-
-					// const serv = app.listen(availablePort, () => {
-					// 	self.infoSync(
-					// 		`The Server is listening via a worker on port:${availablePort}`,
-					// 	);
-					// 	self.adLog("THIS WORKER RUNNING IP:");
-					// 	self.createCustomDomain().then((result) => {
-					// 		console.log("Domain created", result);
-					// 	});
-
-					// 	if (shouldOpenBrowser) self.openBrowserApp(availablePort);
-
-					// 	//self.openBrowserApp();
-					// });
-
-					// serv.timeout = serverTimeout;
-					// setTimeout(function () {
-					// 	if (shouldStopServer) {
-					// 		console.log("Closing server");
-					// 		process.exit(0);
-					// 		//serv.close();
-					// 	}
-					// }, 3000);
-
-					//   process.on('message', function(message) {
-					// 	self.pao.pa_wiLog('Worker ' + process.pid + ' received message from master.', message);
-					// 	if(message.singleProcessTasks == "startSingleProcessTasks") {
-					// 		self.emit({type:'start-single-process-tasks',data:''})
-					// 	}
-					// });
+					self
+						.runServer(app, serverSettings)
+						.then((started) => {
+							console.log("The server has been started", started);
+						})
+						.catch((err) => {
+							console.log("The was an error running the server", err);
+						});
 				}
 			} else {
 				// self.pao.pa_wiLog('IT IS NOT THE MASTER PROCESS')
 				self.pao.pa_wiLog(`Worker ${process.pid} started`);
-				self.runServer(app, serverSettings);
+				self
+					.runServer(app, serverSettings)
+					.then((started) => {
+						console.log("The server has been started", started);
+					})
+					.catch((err) => {
+						console.log("The was an error running the server", err);
+					});
 
-				// let serv = app.listen(availablePort, () => {
-				// 	let PORT = availablePort;
-				// 	self.infoSync(
-				// 		`The Application is running on PID:: ${process.pid} and listening on port: ${PORT}`,
-				// 	);
-				// 	// self.adLog("The Application is listening via workers");
-				// 	// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
-				// 	// self.createCustomDomain().then((result) => {
-				// 	// 	console.log("Domain created", result);
-				// 	// });
-				// 	// self.createCustomDomain();
-				// 	// let protocol = process.env.ANZII_APP_USE_HTTPS
-				// 	// 	? process.env.ANZII_APP_USE_HTTPS
-				// 	// 	: "http";
-				// 	// let domainToUse = process.env?.ANZII_USE_CUSTOM_DOMAIN
-				// 	// 	? process.env?.ANZII_USE_CUSTOM_DOMAIN
-				// 	// 	: "localhost";
-				// 	if (shouldOpenBrowser) {
-				// 		self.openBrowserApp(availablePort, protocol, domainToUse);
-				// 	}
-				// });
-				// process.on("message", function (message) {
-				// 	self.pao.pa_wiLog(
-				// 		"Worker " + process.pid + " received message from master.",
-				// 		message,
-				// 	);
-				// 	if (message.singleProcessTasks == "startSingleProcessTasks") {
-				// 		self.emit({ type: "start-single-process-tasks", data: "" });
-				// 	}
-				// });
-
-				// serv.timeout = serverTimeout;
-
-				// setTimeout(function () {
-				// 	if (shouldStopServer) {
-				// 		console.log("CLOSING SERVER");
-				// 		process.exit(0);
-				// 		//serv.close();
-				// 	}
-				// }, 3000);
+				process.on("message", function (message) {
+					self.pao.pa_wiLog(
+						"Worker " + process.pid + " received message from master.",
+						message,
+					);
+					if (message.singleProcessTasks == "startSingleProcessTasks") {
+						self.emit({ type: "start-single-process-tasks", data: "" });
+					}
+				});
 			}
 		})
 		.catch((err) => {
