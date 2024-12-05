@@ -18,7 +18,7 @@ export const handleCreateSSLCert = function (data) {
 	// eslint-disable-next-line no-unused-vars
 	const self = this;
 	const { payload } = data;
-	const { config } = payload;
+	const { config, sslConfigPath = "" } = payload;
 	const filesOutputPaths = {};
 
 	if (!config?.action && !config?.actions) {
@@ -32,7 +32,11 @@ export const handleCreateSSLCert = function (data) {
 			options = self.runOptions(configItem);
 			console.log("Actions options built string", options);
 			filesOutputPaths[options.output.type] = options.output.value;
-			return await runTerminal(`openssl ${options.commandString}`, loop);
+			return await runTerminal(
+				`openssl ${options.commandString}`,
+				configItem.action,
+				sslConfigPath,
+			);
 		});
 
 		Promise.all(terminalPromises)
@@ -85,9 +89,20 @@ export const handleCreateSSLCert = function (data) {
  * runTerminal will take a command string that is made up of the openssl parent command
  *  and its related applicable sub-comands. The sub-commands will have options of their own
  */
-export const runTerminal = function (commandToRun, loop) {
+export const runTerminal = function (
+	commandToRun,
+	action = "",
+	sslConfigPath = null,
+) {
 	return new Promise(async (resolve, reject) => {
-		execSync(`${commandToRun}`, {
+		console.log("THE ACTION", action);
+		let commandToRunModified = `${
+			action === "create-certificate-signing-request"
+				? `${commandToRun} -config ${sslConfigPath}`
+				: commandToRun
+		}`;
+		console.log("THE COMMAND TO RUN MODIFIED", commandToRunModified);
+		execSync(commandToRunModified, {
 			cwd: process.cwd(),
 			stdio: "inherit",
 		});
