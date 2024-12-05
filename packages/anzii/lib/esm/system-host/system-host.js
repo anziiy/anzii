@@ -12,6 +12,8 @@ class SystemHost {
 		this.getHostFileLocation = methods.getHostFileLocation;
 		this.readFromHostFile = methods.readFromHostFile;
 		this.writeToHostFile = methods.writeToHostFile;
+		this.getSystemType = methods.getSystemType;
+		this.getIpAddress = methods.getIpAddress;
 	}
 }
 
