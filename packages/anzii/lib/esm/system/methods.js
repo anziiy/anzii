@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import fs from "node:fs";
+import https from "node:https";
 import os from "node:os";
+import path from "node:path";
 // import openssl from "openssl-nodejs";
 export const init = function () {
 	this.adLog("System has been initialised");
@@ -93,7 +95,7 @@ export const shutDown = function (type, code) {
 	);
 	type === "uncaughtException" ? self.context.kill(1) : self.context[type]();
 };
-export const masterWorker = function (app) {
+export const masterWorker = function (app, appOpts) {
 	const self = this;
 	// console.log("ENV PORT", self?.context?.env?.PORT);
 	const serverTimeout = self.serverTimeout;
@@ -102,6 +104,21 @@ export const masterWorker = function (app) {
 		? true
 		: false;
 	const shouldStopServer = self?.context?.env?.ANZII_STOP_SERVER ? true : false;
+	const useHttps = self?.context?.evn?.ANZII_APP_USE_HTTP ? true : false;
+	const useCustomDomain = self?.context?.evn?.ANZII_USE_CUSTOM_DOMAIN
+		? true
+		: false;
+	const appProtocol = useHttps ? "https" : "http";
+	const appDomain = useCustomDomain ? appOpts.domainName : "localhost";
+	let serverSettings = {
+		useHttps,
+		useCustomDomain,
+		shouldOpenBrowser,
+		protocol: appProtocol,
+		domainToUse: appDomain,
+		serverTimeout,
+		appOpts,
+	};
 
 	self
 		.getServerPort(portToUse)
@@ -110,6 +127,7 @@ export const masterWorker = function (app) {
 			self.pao.pa_wiLog(`THE STATUS OF isMaster: ${self.cluster.isMaster}`);
 			self.pao.pa_wiLog(`THE cluster, ${self.cluster}`);
 			self.pao.pa_wiLog(`THE CLUSTERS, ${self.clusterCustomConfig}`);
+			serverSettings["availablePort"] = availablePort;
 			if (self.cluster.isMaster) {
 				self.pao.pa_wiLog(`Master ${self.context.pid} is running`);
 				if (self.clusterCustomConfig && self.clusterCustomConfig.spawn) {
@@ -164,28 +182,29 @@ export const masterWorker = function (app) {
 					});
 				} else {
 					self.adLog("System is running on a single thread/core");
-					const serv = app.listen(availablePort, () => {
-						self.infoSync(
-							`The Server is listening via a worker on port:${availablePort}`,
-						);
-						self.adLog("THIS WORKER RUNNING IP:");
-						self.createCustomDomain().then((result) => {
-							console.log("Domain created", result);
-						});
 
-						if (shouldOpenBrowser) self.openBrowserApp(availablePort);
+					// const serv = app.listen(availablePort, () => {
+					// 	self.infoSync(
+					// 		`The Server is listening via a worker on port:${availablePort}`,
+					// 	);
+					// 	self.adLog("THIS WORKER RUNNING IP:");
+					// 	self.createCustomDomain().then((result) => {
+					// 		console.log("Domain created", result);
+					// 	});
 
-						//self.openBrowserApp();
-					});
+					// 	if (shouldOpenBrowser) self.openBrowserApp(availablePort);
 
-					serv.timeout = serverTimeout;
-					setTimeout(function () {
-						if (shouldStopServer) {
-							console.log("Closing server");
-							process.exit(0);
-							//serv.close();
-						}
-					}, 3000);
+					// 	//self.openBrowserApp();
+					// });
+
+					// serv.timeout = serverTimeout;
+					// setTimeout(function () {
+					// 	if (shouldStopServer) {
+					// 		console.log("Closing server");
+					// 		process.exit(0);
+					// 		//serv.close();
+					// 	}
+					// }, 3000);
 
 					//   process.on('message', function(message) {
 					// 	self.pao.pa_wiLog('Worker ' + process.pid + ' received message from master.', message);
@@ -197,47 +216,48 @@ export const masterWorker = function (app) {
 			} else {
 				// self.pao.pa_wiLog('IT IS NOT THE MASTER PROCESS')
 				self.pao.pa_wiLog(`Worker ${process.pid} started`);
-				let serv = app.listen(availablePort, () => {
-					let PORT = availablePort;
-					self.infoSync(
-						`The Application is running on PID:: ${process.pid} and listening on port: ${PORT}`,
-					);
-					// self.adLog("The Application is listening via workers");
-					// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
-					// self.createCustomDomain().then((result) => {
-					// 	console.log("Domain created", result);
-					// });
-					// self.createCustomDomain();
-					let protocol = process.env.ANZII_APP_USE_HTTPS
-						? process.env.ANZII_APP_USE_HTTPS
-						: "http";
-					let domainToUse = process.env?.ANZII_USE_CUSTOM_DOMAIN
-						? process.env?.ANZII_USE_CUSTOM_DOMAIN
-						: "localhost";
-					if (shouldOpenBrowser) {
-						self.openBrowserApp(availablePort, protocol, domainToUse);
-					}
-				});
-				process.on("message", function (message) {
-					self.pao.pa_wiLog(
-						"Worker " + process.pid + " received message from master.",
-						message,
-					);
-					if (message.singleProcessTasks == "startSingleProcessTasks") {
-						self.emit({ type: "start-single-process-tasks", data: "" });
-					}
-				});
+				self.runServer(app, serverSettings);
 
-				serv.timeout = serverTimeout;
-				// self.infoSync("THE TIMEOUT VALUE");
-				// self.infoSync(serv.timeout);
-				setTimeout(function () {
-					if (shouldStopServer) {
-						console.log("CLOSING SERVER");
-						process.exit(0);
-						//serv.close();
-					}
-				}, 3000);
+				// let serv = app.listen(availablePort, () => {
+				// 	let PORT = availablePort;
+				// 	self.infoSync(
+				// 		`The Application is running on PID:: ${process.pid} and listening on port: ${PORT}`,
+				// 	);
+				// 	// self.adLog("The Application is listening via workers");
+				// 	// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
+				// 	// self.createCustomDomain().then((result) => {
+				// 	// 	console.log("Domain created", result);
+				// 	// });
+				// 	// self.createCustomDomain();
+				// 	// let protocol = process.env.ANZII_APP_USE_HTTPS
+				// 	// 	? process.env.ANZII_APP_USE_HTTPS
+				// 	// 	: "http";
+				// 	// let domainToUse = process.env?.ANZII_USE_CUSTOM_DOMAIN
+				// 	// 	? process.env?.ANZII_USE_CUSTOM_DOMAIN
+				// 	// 	: "localhost";
+				// 	if (shouldOpenBrowser) {
+				// 		self.openBrowserApp(availablePort, protocol, domainToUse);
+				// 	}
+				// });
+				// process.on("message", function (message) {
+				// 	self.pao.pa_wiLog(
+				// 		"Worker " + process.pid + " received message from master.",
+				// 		message,
+				// 	);
+				// 	if (message.singleProcessTasks == "startSingleProcessTasks") {
+				// 		self.emit({ type: "start-single-process-tasks", data: "" });
+				// 	}
+				// });
+
+				// serv.timeout = serverTimeout;
+
+				// setTimeout(function () {
+				// 	if (shouldStopServer) {
+				// 		console.log("CLOSING SERVER");
+				// 		process.exit(0);
+				// 		//serv.close();
+				// 	}
+				// }, 3000);
 			}
 		})
 		.catch((err) => {
@@ -356,30 +376,78 @@ export const getSslCerts = function (pathOrSets) {
 	return new Promise((resolve, reject) => {});
 };
 
-export const runHttps = function (app, port = 3000) {
+export const runServer = function (app, serverSettings) {
 	const self = this;
-	self.infoSync(`User preffered port: ${port}`);
-	return new Promise((resolve, reject) => {});
+
+	return new Promise((resolve, reject) => {
+		const { shouldStopServer, serverTimeout, useHttps } = serverSettings;
+		if (useHttps) {
+			self.runHttps(app, serverSettings).then((serv) => {
+				self.setServerOptions(serv, shouldStopServer, serverTimeout);
+				resolve(true);
+			});
+		} else {
+			self.runHttp(app, serverSettings).then((serv) => {
+				self.setServerOptions(serv, shouldStopServer, serverTimeout);
+				resolve(true);
+			});
+		}
+	});
 };
 
-export const runHttp = function (app, port = 3000) {
+export const runHttps = function (app, settings) {
 	const self = this;
-	self.infoSync(`User preffered port: ${port}`);
-	return new Promise((resolve, reject) => {});
+	const { appOpts, availablePort } = settings;
+	const { sslOpts } = appOpts;
+
+	return new Promise((resolve, reject) => {
+		let serv = https.createServer(sslOpts, app).listen(availablePort, () => {
+			self.appListener(settings);
+		});
+		resolve(serv);
+	});
+};
+export const runHttp = function (app, settings) {
+	const self = this;
+	const { availablePort } = settings;
+	self.infoSync(`User preffered port: ${availablePort}`);
+	return new Promise((resolve, reject) => {
+		const serv = app.listen(availablePort, () => {
+			self.appListener(settings);
+		});
+		resolve(serv);
+	});
 };
 
 export const createCustomDomain = function () {
 	const self = this;
+	const pao = self.pao;
+	const loadFile = pao.pa_loadFile;
+
 	self.infoSync(`CreateCustomDomain: `);
-	self.emit({
-		type: `create-ssl-cert`,
-		data: {
-			payload: { certConfi: true },
-			callback: (fromOpenSSl) => {
-				console.log("THE SSL ", fromOpenSSl);
-			},
+	// self.emit({
+	// 	type: `add-host-domain`,
+	// 	data: {
+	// 		payload: { domainName: "testr.co.za" },
+	// 		callback: (fromHosts) => {
+	// 			console.log("THE SSL ", fromHosts);
+	// 		},
+	// 	},
+	// });
+	loadFile(path.resolve(process.cwd(), "certsConfig.json")).then(
+		(sslConfig) => {
+			let config = JSON.parse(sslConfig);
+			self.emit({
+				type: `create-ssl-certificate`,
+				data: {
+					payload: { config },
+					callback: (fromOpenSSl) => {
+						console.log("THE SSL ", fromOpenSSl);
+					},
+				},
+			});
 		},
-	});
+	);
 
 	// return new Promise((resolve, reject) => {
 
@@ -421,4 +489,41 @@ export const readHostsFile = function (next) {
 export const getSystemType = function () {
 	const self = this;
 	return os.platform();
+};
+
+export const appListener = function (settings) {
+	const self = this;
+	const { availablePort, shouldOpenBrowser, protocol, domainToUse } = settings;
+	self.infoSync(
+		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort}`,
+	);
+	// self.adLog("The Application is listening via workers");
+	// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
+	// self.createCustomDomain().then((result) => {
+	// 	console.log("Domain created", result);
+	// });
+	// self.createCustomDomain();
+	// let protocol = isHttps ? "https" : "http";
+	// let domainToUse = process.env?.ANZII_USE_CUSTOM_DOMAIN
+	// 	? process.env?.ANZII_USE_CUSTOM_DOMAIN
+	// 	: "localhost";
+	if (shouldOpenBrowser) {
+		self.openBrowserApp(availablePort, protocol, domainToUse);
+	}
+};
+
+export const setServerOptions = function (
+	serv,
+	shouldStopServer = false,
+	serverTimeout,
+) {
+	const self = this;
+	serv.timeout = serverTimeout;
+	setTimeout(function () {
+		if (shouldStopServer) {
+			console.log("CLOSING SERVER");
+			process.exit(0);
+			//serv.close();
+		}
+	}, 3000);
 };

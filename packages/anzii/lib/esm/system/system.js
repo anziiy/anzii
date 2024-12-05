@@ -39,6 +39,11 @@ class System {
 		this.createCustomDomain = methods.createCustomDomain;
 		this.readHostsFile = methods.readHostsFile;
 		this.getSystemType = methods.getSystemType;
+		this.runServer = methods.runServer;
+		this.runHttps = methods.runHttps;
+		this.runHttp = methods.runHttp;
+		this.appListener = methods.appListener;
+		this.setServerOptions = methods.setServerOptions;
 	}
 }
 export default System;
