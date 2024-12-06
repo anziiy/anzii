@@ -24,7 +24,7 @@ export const handleConfigServer = function (data) {
 		data: { app: self.http, router: self.router },
 	});
 	self.emit({ type: "distribute-system-resources", data: "" });
-	self.startServer();
+	self.startServer(data);
 };
 export const handleDomainResources = function (data = null) {
 	const self = this;
@@ -39,7 +39,8 @@ export const startServer = function (data) {
 	const self = this;
 	// this.startPreRoutes()
 	// this.startRouting()
-	this.runServer();
+	console.log("THe server data object", data);
+	this.runServer(data);
 };
 export const startPreRoutes = function () {
 	const self = this;
@@ -71,9 +72,12 @@ export const startRouting = function () {
 	self.http.get("/home", self.renderHtml.bind(self));
 	self.http.use("/", self.renderHtml.bind(self));
 };
-export const runServer = function () {
+export const runServer = function (data) {
 	const self = this;
-	self.emit({ type: "attach-workers-to-server", data: { app: self.http } });
+	self.emit({
+		type: "attach-workers-to-server",
+		data: { app: self.http, system: data },
+	});
 	// self.http.listen(process.env.PORT || 3000,()=>{
 	//   self.log("The Server is listening",'info')
 	// })
