@@ -95,21 +95,24 @@ export const shutDown = function (type, code) {
 	);
 	type === "uncaughtException" ? self.context.kill(1) : self.context[type]();
 };
-export const masterWorker = function (app, appOpts) {
+export const masterWorker = function (app, system) {
 	const self = this;
 	// console.log("ENV PORT", self?.context?.env?.PORT);
+	console.log("THE System data", system);
 	const serverTimeout = self.serverTimeout;
 	const portToUse = self?.context?.env?.PORT ? self?.context?.env?.PORT : 3000;
 	const shouldOpenBrowser = self?.context?.env?.ANZII_OPEN_BROWSER
 		? true
 		: false;
 	const shouldStopServer = self?.context?.env?.ANZII_STOP_SERVER ? true : false;
-	const useHttps = self?.context?.evn?.ANZII_APP_USE_HTTP ? true : false;
-	const useCustomDomain = self?.context?.evn?.ANZII_USE_CUSTOM_DOMAIN
-		? true
-		: false;
+	const useHttps =
+		system?.useHttps || self?.context?.evn?.ANZII_APP_USE_HTTP ? true : false;
+	const useCustomDomain =
+		system?.useCustomDomain || self?.context?.evn?.ANZII_USE_CUSTOM_DOMAIN
+			? true
+			: false;
 	const appProtocol = useHttps ? "https" : "http";
-	const appDomain = useCustomDomain ? appOpts.domainName : "localhost";
+	const appDomain = useCustomDomain ? system?.domainName : "localhost";
 	let serverSettings = {
 		useHttps,
 		useCustomDomain,
@@ -117,7 +120,7 @@ export const masterWorker = function (app, appOpts) {
 		protocol: appProtocol,
 		domainToUse: appDomain,
 		serverTimeout,
-		appOpts,
+		appOpts: system?.appOpts,
 	};
 
 	self
@@ -255,7 +258,7 @@ export const handleShutDowns = function () {
 };
 export const handleServerAttachWorkers = function (data) {
 	const self = this;
-	self.masterWorker(data.app);
+	self.masterWorker(data.app, data.system);
 };
 export const handleRegisterShutDownCandidate = function (data) {
 	const self = this;
@@ -352,10 +355,10 @@ export const runServer = function (app, serverSettings) {
 export const runHttps = function (app, settings) {
 	const self = this;
 	const { appOpts, availablePort } = settings;
-	const { sslOpts } = appOpts;
+	// const { sslOpts } = appOpts;
 
 	return new Promise((resolve, reject) => {
-		let serv = https.createServer(sslOpts, app).listen(availablePort, () => {
+		let serv = https.createServer(appOpts, app).listen(availablePort, () => {
 			self.appListener(settings);
 		});
 		resolve(serv);
@@ -449,7 +452,10 @@ export const appListener = function (settings) {
 	const self = this;
 	const { availablePort, shouldOpenBrowser, protocol, domainToUse } = settings;
 	self.infoSync(
-		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort}`,
+		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort} with domain: ${domainToUse} and Protocol: ${protocol}`,
+	);
+	self.infoSync(
+		`The formed url is ${protocol}//${domainToUse}:${availablePort}`,
 	);
 	// self.adLog("The Application is listening via workers");
 	// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
