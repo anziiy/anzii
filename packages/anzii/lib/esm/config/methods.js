@@ -236,6 +236,7 @@ export const runAppConfig = function (manualConfig = null) {
 		return;
 	}
 	if (self.config) {
+		let serverConfig = null;
 		self.enviroment();
 		self.config?.cluster
 			? self.emit({ type: "config-system", data: self.config.cluster })
@@ -245,7 +246,10 @@ export const runAppConfig = function (manualConfig = null) {
 			self.pao.pa_wiLog(`THE C IN CONFIG", ${c}`);
 			self.pao.pa_wiLog("The module in Config");
 			self.pao.pa_wiLog(c);
-			if (c === "server") isServerConfig = true;
+			if (c === "server") {
+				serverConfig = config[c];
+				isServerConfig = true;
+			}
 			if (c === "router") {
 				if (config.views) {
 					self.emit({ type: "config-request", data: config[c] });
@@ -285,7 +289,7 @@ export const runAppConfig = function (manualConfig = null) {
 		if (!isServerConfig) {
 			self.emit({
 				type: `config-server`,
-				data: `server`,
+				data: serverConfig,
 			}); // TO be re-organized
 		}
 	}
