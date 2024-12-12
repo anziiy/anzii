@@ -30,7 +30,7 @@ export const handleAddHostDomain = function (data) {
 		);
 	}
 	self.addToHostFile(domainName).then((addToDomainStaus) => {
-		data.callback({ domainName: addToDomainStaus });
+		data.callback({ domainName: domainName, ...addToDomainStaus });
 	});
 };
 
@@ -59,7 +59,11 @@ export const addToHostFile = function (domainName) {
 		let hostFileLocation = self.getHostFileLocation();
 		let hostFileData = self.readFromHostFile(hostFileLocation);
 		if (hostFileData.indexOf(domainName) >= 0) {
-			throw new Error("Domain name is already take", domainName);
+			return resolve({
+				action: "successfull",
+				message: "HostFile has been updated",
+			});
+			// throw new Error("Domain name is already take", domainName);
 		}
 		let newHostEntry = `${hostIpAddress} ${domainName}`; // eg: 127.0.0.1 example.com
 		hostFileData += newHostEntry + "\n";
