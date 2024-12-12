@@ -16,6 +16,10 @@ export const handleConfigServer = function (data) {
 	const self = this;
 	// self.emit({type:'share-middleware',data:''})
 	self.emit({
+		type: "set-domain-defaults",
+		data: { app: self.http, xpress: self.xpress },
+	});
+	self.emit({
 		type: "attach-middleware",
 		data: { app: self.http, xpress: self.xpress },
 	});
@@ -30,10 +34,10 @@ export const handleDomainResources = function (data = null) {
 	const self = this;
 	self.pao.pa_wiLog("THE server is emitting system defaults event");
 	//Custom to be removed
-	self.emit({
-		type: "set-domain-defaults",
-		data: { app: self.http, xpress: self.xpress },
-	});
+	// self.emit({
+	// 	type: "set-domain-defaults",
+	// 	data: { app: self.http, xpress: self.xpress },
+	// });
 };
 export const startServer = function (data) {
 	const self = this;
