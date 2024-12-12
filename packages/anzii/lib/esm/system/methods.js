@@ -112,10 +112,14 @@ export const masterWorker = function (app, system) {
 			? true
 			: false;
 	const appProtocol = useHttps ? "https" : "http";
+	const useAvailablePort = system.useAvailablePort
+		? system.useAvailablePort
+		: true;
 	const appDomain = useCustomDomain ? system?.domainName : "localhost";
 	let serverSettings = {
 		useHttps,
 		useCustomDomain,
+		useAvailablePort,
 		shouldOpenBrowser,
 		protocol: appProtocol,
 		domainToUse: appDomain,
@@ -124,7 +128,7 @@ export const masterWorker = function (app, system) {
 	};
 
 	self
-		.getServerPort(portToUse)
+		.getServerPort(portToUse, useAvailablePort)
 		.then((availablePort) => {
 			self.pao.pa_wiLog(`THE AVAILABLE PORT, ${availablePort}`);
 			self.pao.pa_wiLog(`THE STATUS OF isMaster: ${self.cluster.isMaster}`);
@@ -290,10 +294,12 @@ export const openBrowserApp = async function (
 	// openBrowser()
 };
 
-export const getServerPort = function (port = 3000) {
+export const getServerPort = function (port = 3000, useAvailablePort = true) {
 	const self = this;
 	self.infoSync(`User preffered port: ${port}`);
 	return new Promise((resolve, reject) => {
+		if (!useAvailablePort) return resolve(port);
+
 		self
 			.detectPort(port)
 			.then((gotPort) => {
