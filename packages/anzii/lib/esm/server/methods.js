@@ -41,19 +41,7 @@ export const handleDomainResources = function (data = null) {
 };
 export const startServer = function (data) {
 	const self = this;
-	console.log("THe server data object", data);
-	this.runServer(data);
-};
-export const startPreRoutes = function () {
-	const self = this;
-	self.http.use(self.dependiks.bodyParser.json());
-	self.http.use("*.js", function (req, res, next) {
-		// self.pao.pa_wiLog(req.body)
-		// self.pao.pa_wiLog('Your mobile has reached this code Surprise')
-		res.set("content-type", "text/javascript");
-		return next();
-	});
-	self.http.use(self.xpress.static("public"));
+	self.runServer(data);
 };
 
 export const runServer = function (data) {
@@ -63,24 +51,7 @@ export const runServer = function (data) {
 		data: { app: self.http, system: data },
 	});
 };
-export const renderHtml = function (req, res) {
-	const self = this;
-	self.pao.pa_wiLog("A request has been made to one of the routes");
-	self.pao.pa_wiLog("The html");
-	self.pao.pa_wiLog("The request URL");
-	self.pao.pa_wiLog(req.url);
-	self.request = {
-		req: req,
-		res: res,
-	};
-	self.emit({
-		type: "address-changed",
-		data: {
-			url: req.url,
-		},
-	});
-	//    self.pao.pa_wiLog(this)
-};
+
 export const handleWriteServerRequestResponse = async function (data) {
 	const self = this;
 	self.pao.pa_wiLog("THE DATA TO BE SENT TO CLIENT");
@@ -182,20 +153,12 @@ export const handleWriteServerRequestResponse = async function (data) {
 export const streamResponse = function (data) {
 	const self = this;
 	const pao = self.pao;
-	// const jsonToJs = pao.pa_jsonToJs
-	// let data = jsonToJs(dt)
-	// self.pao.pa_wiLog('THE STREAM IS RUNNING')
-	// self.pao.pa_wiLog(data)
 	const type = self.mimeTypes[data.data.ext];
 	let rStream = data.data.rStream;
 	const withAttachment = data.data.withAttachment || null;
 	if (withAttachment) data.res["withAttachment"] = { ...withAttachment };
-	// self.infoSync('Server is processing stream')
-	// self.infoSync(rStream)
-	// self.infoSync(data)
+
 	rStream.on("open", async function () {
-		// self.pao.pa_wiLog('INSIDE ON AND PIPING')
-		// self.pao.pa_wiLog(type)
 		self.infoSync("THE STREAM IS OPENED");
 		data.res.set("Content-Type", type);
 		data.res.set("Connection", "close");
@@ -212,8 +175,8 @@ export const streamResponse = function (data) {
 		);
 	});
 	rStream.on("error", async function (e) {
-		self.pao.pa_wiLog("THE ERROR READSTREAM");
-		self.pao.pa_wiLog(e);
+		// self.pao.pa_wiLog("THE ERROR READSTREAM");
+		// self.pao.pa_wiLog(e);
 		data.res.set("Content-Type", "application/json");
 		data.res.set("Connection", "close");
 		return data.res.status(404).send({ error: true, message: "Not found" });
@@ -224,11 +187,12 @@ export const streamResponse = function (data) {
 export const getHtml = function (res, view) {
 	const self = this;
 	const pao = self.pao;
-	self.pao.pa_wiLog("THE SET VIEW");
-	self.pao.pa_wiLog(view);
+	// self.pao.pa_wiLog("THE SET VIEW");
+	// self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
 		let serviceUrl = process?.env?.appEndpoint || "http://localhost:3000";
+
 		view.viewData
 			? (viewda = { ...view.viewData, serviceUrl })
 			: (viewda = { title: view.title, serviceUrl });
