@@ -457,6 +457,9 @@ export const getSystemType = function () {
 export const appListener = function (settings) {
 	const self = this;
 	const { availablePort, shouldOpenBrowser, protocol, domainToUse } = settings;
+	process.env[
+		"ANZII_APP_URL"
+	] = `${protocol}://${domainToUse}:${availablePort}`;
 	self.infoSync(
 		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort} with domain: ${domainToUse} and Protocol: ${protocol}`,
 	);
