@@ -98,7 +98,7 @@ export const shutDown = function (type, code) {
 export const masterWorker = function (app, system) {
 	const self = this;
 	// console.log("ENV PORT", self?.context?.env?.PORT);
-	console.log("THE System data", system);
+	// console.log("THE System data", system);
 	const serverTimeout = self.serverTimeout;
 	const portToUse = self?.context?.env?.PORT ? self?.context?.env?.PORT : 3000;
 	const shouldOpenBrowser = self?.context?.env?.ANZII_OPEN_BROWSER
@@ -303,16 +303,16 @@ export const getServerPort = function (port = 3000, useAvailablePort = true) {
 		self
 			.detectPort(port)
 			.then((gotPort) => {
-				console.log("THE GOT PORT", gotPort);
-				console.log("THE CHECKED PORT", port);
-				console.log("THE TYPEOF PORT", typeof port);
-				console.log("THE TYPEOF GOT PORT", typeof gotPort.toString());
-				console.log("THE GOT PORT EQUALS PORT", gotPort === port);
+				// console.log("THE GOT PORT", gotPort);
+				// console.log("THE CHECKED PORT", port);
+				// console.log("THE TYPEOF PORT", typeof port);
+				// console.log("THE TYPEOF GOT PORT", typeof gotPort.toString());
+				// console.log("THE GOT PORT EQUALS PORT", gotPort === port);
 
 				if (gotPort.toString() === port) {
 					resolve(gotPort);
 				} else {
-					console.log("SEARCHING FOR OPEN PORT");
+					// console.log("SEARCHING FOR OPEN PORT");
 					self.portFinder
 						.getPortPromise()
 						.then((openPort) => {
@@ -327,7 +327,7 @@ export const getServerPort = function (port = 3000, useAvailablePort = true) {
 				}
 			})
 			.catch((err) => {
-				console.log("Therw was an error trying to get a port", err);
+				// console.log("Therw was an error trying to get a port", err);
 				reject(err);
 			});
 	});
@@ -464,8 +464,9 @@ export const appListener = function (settings) {
 		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort} with domain: ${domainToUse} and Protocol: ${protocol}`,
 	);
 	self.infoSync(
-		`The formed url is ${protocol}//${domainToUse}:${availablePort}`,
+		`The formed url is ${protocol}://${domainToUse}:${availablePort}`,
 	);
+	self.infoSync(`The app full url: ${process.env.ANZII_APP_URL}`);
 	// self.adLog("The Application is listening via workers");
 	// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
 	// self.createCustomDomain().then((result) => {
