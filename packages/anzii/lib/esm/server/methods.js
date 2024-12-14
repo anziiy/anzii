@@ -14,7 +14,7 @@ export const init = function () {
 };
 export const handleConfigServer = function (data) {
 	const self = this;
-	// self.emit({type:'share-middleware',data:''})
+
 	self.emit({
 		type: "set-domain-defaults",
 		data: { app: self.http, xpress: self.xpress },
@@ -41,21 +41,12 @@ export const handleDomainResources = function (data = null) {
 };
 export const startServer = function (data) {
 	const self = this;
-	// this.startPreRoutes()
-	// this.startRouting()
 	console.log("THe server data object", data);
 	this.runServer(data);
 };
 export const startPreRoutes = function () {
 	const self = this;
 	self.http.use(self.dependiks.bodyParser.json());
-	// self.http.use(function(req, res, next) {
-	// 	// self.pao.pa_wiLog(req.body)
-	// 	// self.pao.pa_wiLog('Your mobile has reached this code Surprise')
-	// 	res.header("Access-Control-Allow-Origin", "*");
-	// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	// 	return next();
-	// });
 	self.http.use("*.js", function (req, res, next) {
 		// self.pao.pa_wiLog(req.body)
 		// self.pao.pa_wiLog('Your mobile has reached this code Surprise')
@@ -64,27 +55,13 @@ export const startPreRoutes = function () {
 	});
 	self.http.use(self.xpress.static("public"));
 };
-export const startRouting = function () {
-	const self = this;
-	//   self.http.get('/smarfo/menu',function(req,res){
-	// 	self.pao.pa_wiLog('Request for menu has just been received')
-	// 	let categories = require('./jsondb/foodcategories.json');
-	// 	return res.send(categories.menu);
-	// })
-	self.http.get("/todo", self.renderHtml.bind(self));
-	self.http.get("/ibr", self.renderHtml.bind(self));
-	self.http.get("/home", self.renderHtml.bind(self));
-	self.http.use("/", self.renderHtml.bind(self));
-};
+
 export const runServer = function (data) {
 	const self = this;
 	self.emit({
 		type: "attach-workers-to-server",
 		data: { app: self.http, system: data },
 	});
-	// self.http.listen(process.env.PORT || 3000,()=>{
-	//   self.log("The Server is listening",'info')
-	// })
 };
 export const renderHtml = function (req, res) {
 	const self = this;

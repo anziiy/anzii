@@ -46,7 +46,6 @@ class Server {
 			methods.handleWriteServerRequestResponse;
 		this.startServer = methods.startServer;
 		this.startPreRoutes = methods.startPreRoutes;
-		this.startRouting = methods.startRouting;
 		this.streamResponse = methods.streamResponse;
 		this.runServer = methods.runServer;
 		this.renderHtml = methods.renderHtml;
