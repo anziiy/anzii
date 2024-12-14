@@ -3,8 +3,7 @@
 export const init = function () {
 	this.adLog("Server has been initialised");
 	this.adLog("SERVER IS STARTING UP");
-	//   self.pao.pa_wiLog(this.pao)
-	//   self.pao.pa_wiLog(this)
+
 	this.listens({
 		"config-server": this.handleConfigServer.bind(this),
 		"config-domain-resources": this.handleDomainResources.bind(this),
@@ -54,16 +53,16 @@ export const runServer = function (data) {
 
 export const handleWriteServerRequestResponse = async function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE DATA TO BE SENT TO CLIENT");
-	self.pao.pa_wiLog(data.method);
-	self.pao.pa_wiLog(data.method === "renderView");
+	// self.pao.pa_wiLog("THE DATA TO BE SENT TO CLIENT");
+	// self.pao.pa_wiLog(data.method);
+	// self.pao.pa_wiLog(data.method === "renderView");
 	if (data.method === "stream") {
 		return self.streamResponse(data);
 	} else if (data.method === "renderView") {
-		self.pao.pa_wiLog("THE RENDERVIEW");
-		self.pao.pa_wiLog(data);
+		// self.pao.pa_wiLog("THE RENDERVIEW");
+		// self.pao.pa_wiLog(data);
 		let view = data.data.data;
-		self.pao.pa_wiLog("MAKING A VIEW request response");
+		// self.pao.pa_wiLog("MAKING A VIEW request response");
 		data.res.set("Connection", "close");
 		// self.pao.pa_wiLog(data)
 		// self.pao.pa_wiLog(data.method)
@@ -99,7 +98,7 @@ export const handleWriteServerRequestResponse = async function (data) {
 				});
 			return;
 		} else if (view.type === "modular") {
-			self.pao.pa_wiLog("rENDEING MODULAR VIEW");
+			// self.pao.pa_wiLog("rENDEING MODULAR VIEW");
 			// self.infoSync(view.view)
 			data.res.status(200).send(view.view);
 			return self.infoSync(
@@ -191,7 +190,7 @@ export const getHtml = function (res, view) {
 	// self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
-		let serviceUrl = process?.env?.appEndpoint || "http://localhost:3000";
+		let serviceUrl = process.env.ANZII_APP_URL;
 
 		view.viewData
 			? (viewda = { ...view.viewData, serviceUrl })
@@ -233,8 +232,7 @@ export const getHtmlSkeleton = function (html, head = null, scripts = []) {
     </head>
 		<body>
 			<div id="root">${html}</div>
-			
-
+		
 		</body>
 		</html>
     `;
