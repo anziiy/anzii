@@ -168,37 +168,19 @@ export const handleWriteServerRequestResponse = async function (data) {
 		if (data.data.accepts) {
 			switch (data.data.accepts) {
 				case "json":
-					data.res.status(data.data.code).send(data.data);
+					data.res.status(200).send(data.data);
 					break;
 				case "html":
-					if (data.data.sendFile) {
-						console.log("Request should sendFILE", data.data);
-						return data.res
-							.status(data.data.code)
-							.sendFile(data.data.fileSource);
-					}
 					self
 						.getHtml(data.res, {
 							view: "main/404",
 							title: "Page could not be found",
 						})
 						.then((html) => {
-							console.log("THE HTML BEING SENT");
-							return data.res.status(data.data.code).send(
-								self.getHtmlSkeleton(html.html, {
-									title: "Page could not be found",
-								}),
-							);
+							return data.res.status(200).send(html.html);
 						})
 						.catch((e) => {
-							return data.res.status(data.data.code).send(
-								self.getHtmlSkeleton(
-									"<h1>404 Resource could not be found</h1>",
-									{
-										title: "Page Could not be found",
-									},
-								),
-							);
+							return data.res.status(200).send(e.html);
 						});
 					break;
 				default:
@@ -261,7 +243,11 @@ export const getHtml = function (res, view) {
 	self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
-		view.viewData ? (viewda = view.viewData) : (viewda = { title: view.title });
+		let serviceUrl = process?.env?.appEndpoint || "http://localhost:3000";
+		view.viewData
+			? (viewda = { ...view.viewData, serviceUrl })
+			: (viewda = { title: view.title, serviceUrl });
+		console.log("THE VIEWDA", viewda);
 		res.render(view.view, viewda, (err, html) => {
 			if (err) {
 				self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");

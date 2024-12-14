@@ -12,7 +12,7 @@ export const handleSetDomainDefaults = function (data) {
 	const passport = self.passport;
 
 	const path = self.path;
-	self.infoSync("SETTING DOMAIN DEFAULTS");
+	// self.infoSync("SETTING DOMAIN DEFAULTS");
 	self.pao.pa_wiLog(`Domain resources data, ${data}`);
 	self.pao.pa_wiLog(`THE DOMAINS, ${domains}`);
 	self.pao.pa_wiLog(`THE DOMAINS PASSPORT, ${passport}`);
@@ -39,8 +39,7 @@ export const handleSetDomainDefaults = function (data) {
 			self.pao.pa_wiLog(`DOMAIN IS STATIC", ${dumain}`);
 			self.pao.pa_wiLog(`DOCUMENT ROOT", ${self.system?.DOCUMENT_ROOT}`);
 			self.pao.pa_wiLog(
-				"JOINED PATH",
-				path.join(self.system?.DOCUMENT_ROOT, dumain.set),
+				`JOINED PATH : ${path.join(self.system?.DOCUMENT_ROOT, dumain.set)}`,
 			);
 			return data.app.use(
 				data.xpress.static(path.join(self.system?.DOCUMENT_ROOT, dumain.set)),

@@ -16,6 +16,10 @@ export const handleConfigServer = function (data) {
 	const self = this;
 	// self.emit({type:'share-middleware',data:''})
 	self.emit({
+		type: "set-domain-defaults",
+		data: { app: self.http, xpress: self.xpress },
+	});
+	self.emit({
 		type: "attach-middleware",
 		data: { app: self.http, xpress: self.xpress },
 	});
@@ -24,22 +28,23 @@ export const handleConfigServer = function (data) {
 		data: { app: self.http, router: self.router },
 	});
 	self.emit({ type: "distribute-system-resources", data: "" });
-	self.startServer();
+	self.startServer(data);
 };
 export const handleDomainResources = function (data = null) {
 	const self = this;
 	self.pao.pa_wiLog("THE server is emitting system defaults event");
 	//Custom to be removed
-	self.emit({
-		type: "set-domain-defaults",
-		data: { app: self.http, xpress: self.xpress },
-	});
+	// self.emit({
+	// 	type: "set-domain-defaults",
+	// 	data: { app: self.http, xpress: self.xpress },
+	// });
 };
 export const startServer = function (data) {
 	const self = this;
 	// this.startPreRoutes()
 	// this.startRouting()
-	this.runServer();
+	console.log("THe server data object", data);
+	this.runServer(data);
 };
 export const startPreRoutes = function () {
 	const self = this;
@@ -71,9 +76,12 @@ export const startRouting = function () {
 	self.http.get("/home", self.renderHtml.bind(self));
 	self.http.use("/", self.renderHtml.bind(self));
 };
-export const runServer = function () {
+export const runServer = function (data) {
 	const self = this;
-	self.emit({ type: "attach-workers-to-server", data: { app: self.http } });
+	self.emit({
+		type: "attach-workers-to-server",
+		data: { app: self.http, system: data },
+	});
 	// self.http.listen(process.env.PORT || 3000,()=>{
 	//   self.log("The Server is listening",'info')
 	// })
@@ -168,37 +176,19 @@ export const handleWriteServerRequestResponse = async function (data) {
 		if (data.data.accepts) {
 			switch (data.data.accepts) {
 				case "json":
-					data.res.status(data.data.code).send(data.data);
+					data.res.status(200).send(data.data);
 					break;
 				case "html":
-					if (data.data.sendFile) {
-						console.log("Request should sendFILE", data.data);
-						return data.res
-							.status(data.data.code)
-							.sendFile(data.data.fileSource);
-					}
 					self
 						.getHtml(data.res, {
 							view: "main/404",
 							title: "Page could not be found",
 						})
 						.then((html) => {
-							console.log("THE HTML BEING SENT");
-							return data.res.status(data.data.code).send(
-								self.getHtmlSkeleton(html.html, {
-									title: "Page could not be found",
-								}),
-							);
+							return data.res.status(200).send(html.html);
 						})
 						.catch((e) => {
-							return data.res.status(data.data.code).send(
-								self.getHtmlSkeleton(
-									"<h1>404 Resource could not be found</h1>",
-									{
-										title: "Page Could not be found",
-									},
-								),
-							);
+							return data.res.status(200).send(e.html);
 						});
 					break;
 				default:
@@ -261,7 +251,11 @@ export const getHtml = function (res, view) {
 	self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
-		view.viewData ? (viewda = view.viewData) : (viewda = { title: view.title });
+		let serviceUrl = process?.env?.appEndpoint || "http://localhost:3000";
+		view.viewData
+			? (viewda = { ...view.viewData, serviceUrl })
+			: (viewda = { title: view.title, serviceUrl });
+		console.log("THE VIEWDA", viewda);
 		res.render(view.view, viewda, (err, html) => {
 			if (err) {
 				self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");

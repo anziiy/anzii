@@ -10,7 +10,7 @@ export const handleAttachMiddleware = function (data) {
 	this.attachMiddleware(data);
 };
 export const handleConfigMiddleware = function (data) {
-	console.log("CONFIG MIDDLEWARE", data);
+	// console.log("CONFIG MIDDLEWARE", data);
 	const self = this;
 	//  self.pao.pa_wiLog('THE HANDLE CONFIG MIDDLEWARE')
 	//  self.pao.pa_wiLog(data)
@@ -32,10 +32,10 @@ export const handleConfigMiddleware = function (data) {
 			} else if (p === "removeMiddleware") {
 			}
 		} else {
-			console.log("CONFIG MIDDLEWALRES", middlewares, p);
+			// console.log("CONFIG MIDDLEWALRES", middlewares, p);
 			if (middlewares[p].addMiddleware) {
 				self.middlewares[p] = [...middlewares[p].addMiddleware];
-				console.log("CONFIG MIDDLEWARES SELF", self.middlewares);
+				// console.log("CONFIG MIDDLEWARES SELF", self.middlewares);
 			}
 		}
 	}
@@ -109,23 +109,23 @@ export const attachMiddleware = function (data) {
 				data: { middleware: { private: self.middlewares.pprivate } },
 			});
 		} else if (self.middlewares.ppublic) {
-			console.log("CONFIG MIDDLEWARE public");
+			// console.log("CONFIG MIDDLEWARE public");
 			self.emit({
 				type: "router-middleware",
 				data: { middleware: { public: self.middlewares.ppublic } },
 			});
 		}
 		if (self.middlewares.all) {
-			console.log(
-				"CONFIG MIDDLEWARE PROCESSING ALL MIDDLEWARE",
-				self.middlewares.all,
-			);
+			// console.log(
+			// 	"CONFIG MIDDLEWARE PROCESSING ALL MIDDLEWARE",
+			// 	self.middlewares.all,
+			// );
 
 			// self.pao.pa_wiLog('FOR EVERY REQUEST MIDDLEWARES')
 			// self.pao.pa_wiLog(self.middlewares.all)
 			// eslint-disable-next-line no-unused-vars
 			self.middlewares.all.forEach((m, i) => {
-				console.log("MIDDLEWARE ALL", m);
+				// console.log("MIDDLEWARE ALL", m);
 				if (m.type === "function") {
 					if (m?.options) {
 						data.app.use(m.value(m.options));

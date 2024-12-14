@@ -29,8 +29,10 @@ export const getConfigFile = function () {
 	return new Promise((resolve) => {
 		loadFile(path.resolve("./", ".config.js"))
 			.then((foundFile) => {
-				self.pao.pa_wiLog(`Console.log fOUNDfiLE", ${foundFile}`);
-				self.config = foundFile.default;
+				self.pao.pa_wiLog(
+					`Console.log fOUNDfiLE, ${JSON.stringify(foundFile)}`,
+				);
+				self.config = foundFile;
 				resolve(true);
 			})
 			.catch((err) => {

@@ -105,6 +105,7 @@ export const getClientDriver = function (client) {
 export const connect = function (client) {
 	const self = this;
 	self.infoSync(`System is connecting to client: ${client.name}`);
+	self.infoSync(client.connect);
 	try {
 		let sclient = self.supportedClients[client.name];
 		let opts = {

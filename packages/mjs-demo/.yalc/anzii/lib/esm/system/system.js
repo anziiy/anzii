@@ -16,7 +16,7 @@ class System {
 		this.shutDownServices = [];
 		this.numOfDBSD = 3;
 		this.allowedDBSTR = 10000;
-		this.serverTimeout = 3000;
+		this.serverTimeout = 1000 * 60 * 3;
 		this.systemIsShuttingDown = false;
 		this.shutDownOrder = [];
 		this.systemBase = { DOCUMENT_ROOT: process.cwd() };

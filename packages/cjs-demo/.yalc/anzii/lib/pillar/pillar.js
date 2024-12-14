@@ -141,17 +141,17 @@ export const p_hashToArray = function (obj, hashKeyProp) {
 	}, []);
 };
 export const p_capitalizeFirstLetter = function (text) {
-	console.log("The text Uppercasing;;;", text);
+	// console.log("The text Uppercasing;;;", text);
 	return `${text.slice(0, 1).toUpperCase()}${text.slice(1)}`;
 };
 export const p_capitalizeLastLetter = function (text) {
-	console.log("The text Lowercasing;;;", text);
+	// console.log("The text Lowercasing;;;", text);
 	return `${text.slice(0, text.length - 1)}${text
 		.slice(text.length - 1)
 		.toLowerCase()}`;
 };
 export const p_camelCase = function (text, sep = "-") {
-	console.log("The camelCasing;;;", text);
+	// console.log("The camelCasing;;;", text);
 	if (!sep) return text;
 	if (text.indexOf(sep) < 0) return text;
 
@@ -333,9 +333,9 @@ export const p_isBoolean = function (value) {
 export function // p_isDirectory(item){
 // },
 p_isExistingDir(filePath) {
-	console.log("THE EXISTANCE PATH", filePath);
+	// console.log("THE EXISTANCE PATH", filePath);
 	const checkResults = fs.existsSync(filePath);
-	console.log("existence results", checkResults);
+	// console.log("existence results", checkResults);
 	return checkResults;
 }
 export const p_makeFolderSync = function (absolutePath) {
@@ -346,7 +346,7 @@ export const p_makeFolderSync = function (absolutePath) {
 export const p_saveToFile = function (fileToSaveTo, contents) {
 	// const contents = fs.readFileSync(origFilePath, 'utf8');
 	const writePath = `${fileToSaveTo}`;
-	console.log("saveToFile", writePath);
+	// console.log("saveToFile", writePath);
 	fs.writeFileSync(writePath, contents, "utf8");
 };
 export function p_wiLog(message) {
@@ -872,10 +872,12 @@ export const p_loadFile = function (filepath) {
 		}
 		import(filepath)
 			.then((moduleFound) => {
-				console.log("THE FOUND MODULE", moduleFound);
-				resolve(moduleFound);
+				// console.log("THE FOUND MODULE", moduleFound);
+				let foundFileContent = moduleFound?.default || moduleFound;
+				resolve(foundFileContent);
 			})
-			.catch((err) => {
+			.catch((importERR) => {
+				// console.log("IMPORT ERROR", importERR);
 				try {
 					const readFile = p_loadFileSync(filepath);
 					this.p_wiLog(`THE READ FILE, ${JSON.stringify(readFile)}`);
@@ -896,9 +898,9 @@ export const p_loadFile = function (filepath) {
 };
 export const p_loadFileSync = function (filepath) {
 	//if(!p_isExistingDir(filepath) || filepath !== "@babel/register" || filepath !== "babel-register") return ({code:"FILE_PATH_ERROR",message:"File path does not exist",filePath:filepath})
-	console.log("REQUIRE'S");
+	// console.log("REQUIRE'S");
 	const foundFile = require(filepath);
-	console.log("THE FILE FOUND FROM REQUIRE", foundFile);
+	// console.log("THE FILE FOUND FROM REQUIRE", foundFile);
 	return foundFile;
 };
 

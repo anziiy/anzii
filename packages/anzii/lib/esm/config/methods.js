@@ -29,8 +29,10 @@ export const getConfigFile = function () {
 	return new Promise((resolve) => {
 		loadFile(path.resolve("./", ".config.js"))
 			.then((foundFile) => {
-				self.pao.pa_wiLog(`Console.log fOUNDfiLE", ${foundFile}`);
-				self.config = foundFile.default;
+				self.pao.pa_wiLog(
+					`Console.log fOUNDfiLE, ${JSON.stringify(foundFile)}`,
+				);
+				self.config = foundFile;
 				resolve(true);
 			})
 			.catch((err) => {
@@ -64,11 +66,18 @@ export const configure = function () {
 	const isAnziiCliWithServer =
 		anziiCliWithServer && anziiCliWithServer === "true" ? true : false;
 	const initializeCliWithServer = isAppCli && isAnziiCliWithServer;
+	const anziiKickoffManually = process.env?.ANZII_KICK_OFF_MANUALLY;
+	const isAnziiInitiateManually =
+		(anziiKickoffManually && anziiKickoffManually === "true") || null;
 
 	self.pao.pa_wiLog(`THE CONFIG IS APP CLI: ${isAppCli}`);
 	self.pao.pa_wiLog(`THE CONFIG initi ${initializeCliWithServer}`);
 
-	if (initializeCliWithServer) return self.configLogger();
+	if (initializeCliWithServer || (isAnziiInitiateManually && !self.config)) {
+		self.configLogger();
+		return self.configReady();
+	}
+
 	self.configLogger();
 	self.runAppConfig();
 };
@@ -141,11 +150,14 @@ export const enviroment = function () {
 };
 export const handleManualConfig = function (data = null) {
 	const self = this;
-	self.pao.pa_wiLog.log(
+	self.pao.pa_wiLog(
 		`MANUAL SERVER TRIGGER ACTIVATED,
 		${data?.payload?.configs}`,
 	);
-	// if()
+	if (data?.payload?.customKickOff) {
+		self.config = data?.payload?.config;
+		return self.runAppConfig();
+	}
 	self.runAppConfig(data);
 };
 export const runAppConfig = function (manualConfig = null) {
@@ -162,11 +174,11 @@ export const runAppConfig = function (manualConfig = null) {
 		let { compiler, wepackMiddlewares, webpackConfig } = payload;
 		const { webpackDevMiddleware, webpackHotMiddleware } = wepackMiddlewares;
 
-		self.pao.pa_wiLog("THE CONFIG");
-		self.pao.pa_wiLog(JSON.stringify(config));
-		self.pao.pa_wiLog(`runAPPcoNFIG", ${JSON.stringify(manualConfig)}`);
-		self.pao.pa_wiLog(`THE APP CONFIG", ${JSON.stringify(self.config)}`);
-		self.pao.pa_wiLog(`THE COMPILEr", ${manualConfig?.payload?.webpackConfig}`);
+		// self.pao.pa_wiLog("THE CONFIG");
+		// self.pao.pa_wiLog(JSON.stringify(config));
+		// self.pao.pa_wiLog(`runAPPcoNFIG", ${JSON.stringify(manualConfig)}`);
+		// self.pao.pa_wiLog(`THE APP CONFIG", ${JSON.stringify(self.config)}`);
+		// self.pao.pa_wiLog(`THE COMPILEr", ${manualConfig?.payload?.webpackConfig}`);
 
 		/* The code immediately after this comment should be re-organized 
       it's just using a quick dirty approach to test some logic
@@ -210,16 +222,6 @@ export const runAppConfig = function (manualConfig = null) {
 		};
 	}
 
-	//if (dumain.name === "webpackDevMiddleware")
-	//     return data.app.use(dumain.use(data.custom.compiler, {
-	//         publicPath: data.custom.webpackConfig.output.path,
-	//         writeToDisk: true
-	//     }));
-	// if (dumain.name === "webpackHotMiddleware")
-	//     return data.app.use(dumain.use(data.custom.compiler));
-
-	// self.pao.pa_wiLog('THE VALUE OF CONFIG SELF.CONFIG')
-	// self.pao.pa_wiLog(self.config)
 	if (!self.config) {
 		self.emit({ type: "config-system", data: { workers: 1, spawn: true } });
 		// if (manualConfig)
@@ -234,6 +236,7 @@ export const runAppConfig = function (manualConfig = null) {
 		return;
 	}
 	if (self.config) {
+		let serverConfig = null;
 		self.enviroment();
 		self.config?.cluster
 			? self.emit({ type: "config-system", data: self.config.cluster })
@@ -243,17 +246,33 @@ export const runAppConfig = function (manualConfig = null) {
 			self.pao.pa_wiLog(`THE C IN CONFIG", ${c}`);
 			self.pao.pa_wiLog("The module in Config");
 			self.pao.pa_wiLog(c);
-			if (c === "server") isServerConfig = true;
-			c === "router"
-				? config.views
-					? (self.emit({ type: "config-request", data: config[c] }),
-					  self.emit({
-							type: "config-view",
-							data: { routes: config[c], handlers: config.views },
-					  }))
-					: (self.emit({ type: "config-request", data: config[c] }),
-					  self.emit({ type: "config-view", data: config[c] }))
-				: "";
+			if (c === "server") {
+				serverConfig = config[c];
+				isServerConfig = true;
+			}
+			if (c === "router") {
+				if (config.views) {
+					self.emit({ type: "config-request", data: config[c] });
+					self.emit({
+						type: "config-view",
+						data: { routes: config[c], handlers: config.views },
+					});
+					self.emit({
+						type: "take-ssr-routes",
+						data: { payload: { routes: config[c] } },
+					});
+				} else {
+					self.emit({ type: "config-request", data: config[c] });
+					self.emit({
+						type: "config-view",
+						data: { routes: config[c], handlers: config.views },
+					});
+					self.emit({
+						type: "take-ssr-routes",
+						data: { payload: { routes: config[c] } },
+					});
+				}
+			}
 			if (c !== "logger" || c !== "views") {
 				self.emit({
 					type: `config-${c}`,
@@ -267,13 +286,12 @@ export const runAppConfig = function (manualConfig = null) {
 
 		self.emit({ type: "config-domain-resources", data: null }); // to be re-organized
 		self.pao.pa_wiLog(`isServer Value", ${isServerConfig}`);
-		// if (!isServerConfig) {
-
-		// 	self.emit({
-		// 		type: `config-server`,
-		// 		data: `server`,
-		// 	}); // TO be re-organized
-		// }
+		if (!isServerConfig) {
+			self.emit({
+				type: `config-server`,
+				data: serverConfig,
+			}); // TO be re-organized
+		}
 	}
 
 	// const theWatcher = manualConfig?.payload?.compiler.watch(
@@ -327,6 +345,15 @@ export const doBefore = function () {
 	// const packageJSON =  fs.readFileSync('./package.json');
 	// console.log("The package.json",packageJSON)
 	// self.configure()
+};
+export const configReady = function () {
+	const self = this;
+	const pao = self.pao;
+
+	self.emit({
+		type: `config-is-ready`,
+		data: {},
+	});
 };
 export const mergeConfigs = function (configToMerge) {
 	const self = this;

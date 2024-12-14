@@ -23,7 +23,7 @@ export const handleAttachRoutes = function (data) {
 };
 export const attachRoutes = function (data) {
 	const self = this;
-	console.log("ATTACHING ROUTES", data);
+
 	if (data.app) {
 		let aliasList = [];
 		let aliatikHandlers = [];
@@ -78,12 +78,50 @@ export const attachRoutes = function (data) {
 			r["router"] = data.router;
 			self.renderRoute(r);
 		});
-		data.router.use("*.js", (req, res, next) => {
-			res.set("Content-Type", "text/javascript");
-			next();
-		});
+		// data.router.use("*.js", (req, res, next) => {
+		// 	res.set("Content-Type", "text/javascript");
+		// 	console.log("SETTING JS");
+		// 	return res.status(200);
+		// });
+		// data.router.use(
+		// 	/\.(gif|jpe?g|tiff?|png|webp|bmp|ico)$/i,
+		// 	(req, res, next) => {
+		// 		var extname = path.extname(req.url);
+		// 		let ext = "";
+
+		// 		switch (extname) {
+		// 			case ".png":
+		// 				ext = "image/png";
+		// 				break;
+		// 			case ".svg":
+		// 				ext = "image/svg+xml";
+		// 				break;
+		// 			case ".gif":
+		// 				ext = "image/gif";
+		// 				break;
+		// 			case ".jpeg":
+		// 				ext = "image/jpeg";
+		// 				break;
+		// 			case ".jpg":
+		// 				ext = "image/jpg";
+		// 				break;
+		// 			default:
+		// 				console.log("UNKNOWN EXTENSION");
+		// 		}
+		// 		console.log("SETTING IMAGES");
+		// 		res.set("Content-Type", `${ext}`);
+
+		// 		return res.status(200);
+		// 	},
+		// );
+		// data.router.use("*.css", (req, res, next) => {
+		// 	console.log("SETTING CSS");
+		// 	res.set("Content-Type", "text/css");
+		// 	return res.status(200);
+		// });
 
 		data.router.use(self.outOfRouterContext.bind(this));
+		// data.app.get("/*", self.outOfRouterContext.bind(this));
 		aliasList.length > 0
 			? self.emit({
 					type: "router-alias-list",
@@ -96,7 +134,7 @@ export const attachRoutes = function (data) {
 export const renderRoute = function (r) {
 	const self = this;
 	const pao = this.pao;
-	console.log("ATTACHING ROUTES: RENDER ROUTE", self.routerMiddleware, r.type);
+
 	let routy = {
 		router: r.router,
 		method: r.method,
@@ -150,7 +188,7 @@ export const appendRouter = function (r) {
 		// self.infoSync(r.path)
 		// self.infoSync(r.middleware)
 		// self.infoSync(r.handOver)
-		console.log("THE ROUTER BEING CONFIGURED", r);
+
 		r.router[r.method.toLowerCase()](
 			r.path,
 			r.middleware,
@@ -190,46 +228,79 @@ export const outOfRouterContext = async function (req, res) {
 	self.infoSync("Handling out of context route");
 	self.infoSync(req.originalUrl);
 	self.adLog("THE OUTOFROUTERCONTEXT REQUESTS");
+	// let folderPatH = `${self.pao.pa_getWorkingFolder()}${self.path.sep}build${
+	// 	self.path.sep
+	// }index.html`;
+
+	// data = {
+	// 	error: false,
+	// 	accepts: "html",
+	// 	type: "StaticServe",
+	// 	code: 200,
+	// 	sendFile: true,
+	// 	fileSource: folderPatH,
+	// };
+	// if (self) {
+	// 	return res.sendFile(folderPatH);
+	// 	// return self.emit({
+	// 	// 	type: "write-server-request-response",
+	// 	// 	data: { data: data, res: res },
+	// 	// });
+	// }
+
 	// self.logSync(req.is)
 	// self.logSync(req.get)
 	// self.logSync(req.is('text'))
 	self.adLog(req.accepts(["html", "json"]));
+
 	// self.logSync(req.accepts())
 	if (req.accepts(["html", "json"]) === "json") {
 		data = {
+			error: false,
+			accepts: "html",
+			type: "StaticServe",
+			code: 200,
+			sendFile: true,
+			fileSource: folderPath,
+		};
+	} else if (req.accepts(["html", "json"]) === "html") {
+		// console.log("REQUEST ACCEPTS IN HTML", req.accepts(["html", "json"]));
+		// let folderPath = `${self.pao.pa_getWorkingFolder()}${self.path.sep}views${
+		// 	self.path.sep
+		// }index.html`;
+		// self.pao.pa_wiLog(`folder path: ${folderPath}`);
+		// self.pao.pa_wiLog(`working folder: ${self.pao.pa_getWorkingFolder()}`);
+		// self.pao.pa_wiLog(
+		// 	`IS EXISTING FOLDER VIEWS: ${self.pao.pa_isExistingDir(
+		// 		folderPath.trim(),
+		// 	)}`,
+		// );
+		// if (self.pao.pa_isExistingDir(folderPath.trim())) {
+		// 	data = {
+		// 		error: false,
+		// 		accepts: "html",
+		// 		type: "StaticServe",
+		// 		code: 200,
+		// 		sendFile: true,
+		// 		fileSource: folderPath,
+		// 	};
+		// } else {
+		// 	data = {
+		// 		error: true,
+		// 		accepts: "html",
+		// 		type: "NotFound",
+		// 		code: 404,
+		// 		message: "Resource was not found: OutOfContext",
+		// 	};
+		// }
+
+		data = {
 			error: true,
-			accepts: "json",
+			accepts: "html",
 			type: "NotFound",
 			code: 404,
 			message: "Resource was not found: OutOfContext",
 		};
-	} else if (req.accepts(["html", "json"]) === "html") {
-		let folderPath = `${self.pao.pa_getWorkingFolder()}/views/index.html`;
-		self.pao.pa_wiLog(`folder path: ${folderPath}`);
-		self.pao.pa_wiLog(`working folder: ${self.pao.pa_getWorkingFolder()}`);
-		self.pao.pa_wiLog(
-			`IS EXISTING FOLDER VIEWS: ${self.pao.pa_isExistingDir(
-				folderPath.trim(),
-			)}`,
-		);
-		if (self.pao.pa_isExistingDir(folderPath.trim())) {
-			data = {
-				error: false,
-				accepts: "html",
-				type: "StaticServe",
-				code: 200,
-				sendFile: true,
-				fileSource: folderPath,
-			};
-		} else {
-			data = {
-				error: true,
-				accepts: "html",
-				type: "NotFound",
-				code: 404,
-				message: "Resource was not found: OutOfContext",
-			};
-		}
 	} else {
 		data = {
 			error: true,
@@ -246,7 +317,7 @@ export const outOfRouterContext = async function (req, res) {
 };
 export async function handOver(req, res, next) {
 	const self = this;
-	console.log("HANDOVER IS IN ACTION");
+
 	await self.pao.pa_wiLog("THE CAUGHT REQUEST INSIDE ROUTER::END POINT HIT");
 	self.infoSync(next);
 	let reqresID = self.pao.pa_generateUniqueID();
