@@ -59,47 +59,37 @@ export const handleWriteServerRequestResponse = async function (data) {
 	if (data.method === "stream") {
 		return self.streamResponse(data);
 	} else if (data.method === "renderView") {
-		// self.pao.pa_wiLog("THE RENDERVIEW");
-		// self.pao.pa_wiLog(data);
 		let view = data.data.data;
-		// self.pao.pa_wiLog("MAKING A VIEW request response");
 		data.res.set("Connection", "close");
-		// self.pao.pa_wiLog(data)
-		// self.pao.pa_wiLog(data.method)
-		// self.pao.pa_wiLog(data.data)
-		// self.pao.pa_wiLog(view)
-		// self.pao.pa_wiLog(data.data.type === 'template')
+
 		if (view.type.trim() === "template") {
-			self.pao.pa_wiLog("Rendering template view");
-			self.pao.pa_wiLog(data.data.view);
-			self.pao.pa_wiLog("Rendering inside try");
 			self
 				.getHtml(data.res, view)
 				.then(async (html) => {
-					html.success
-						? (data.res.status(200).send(html.html),
-						  // eslint-disable-next-line no-mixed-spaces-and-tabs
-						  // eslint-disable-next-line no-mixed-spaces-and-tabs
-						  self.infoSync(
+					if (html.success) {
+						data.res.status(200).send(html.html),
+							// eslint-disable-next-line no-mixed-spaces-and-tabs
+							// eslint-disable-next-line no-mixed-spaces-and-tabs
+							self.infoSync(
 								`SERVER HAS SUCCESSFULLY SENT RESPONSE TO CLIENT WITH RESPONSE ID::${
 									data.res.R_ID.split("-")[0]
 								}`,
 								// eslint-disable-next-line no-mixed-spaces-and-tabs
-						  ))
-						: (data.res.status(200).send(html.html),
-						  self.infoSync(
+							);
+					} else {
+						data.res.status(404).send(html.html),
+							self.infoSync(
 								`SERVER HAS SENT A FAILED RESPONSE BACK TO CLIENT WITH RESPONSE ID::${
 									data.res.R_ID.split("-")[0]
 								}`,
-						  ));
+							);
+					}
 				})
 				.catch((e) => {
-					data.res.status(200).send(e.html);
+					data.res.status(500).send(e.html);
 				});
 			return;
 		} else if (view.type === "modular") {
-			// self.pao.pa_wiLog("rENDEING MODULAR VIEW");
-			// self.infoSync(view.view)
 			data.res.status(200).send(view.view);
 			return self.infoSync(
 				`SERVER HAS SUCCESSFULLY SENT RESPONSE TO CLIENT WITH RESPONSE ID::${
@@ -107,7 +97,6 @@ export const handleWriteServerRequestResponse = async function (data) {
 				}`,
 			);
 		}
-		// self.streamResponse(data)
 	} else {
 		data.R_ID
 			? self.infoSync(
@@ -192,14 +181,14 @@ export const getHtml = function (res, view) {
 		let viewda = null;
 		let serviceUrl = process.env.ANZII_APP_URL;
 
-		view.viewData
+		view?.viewData
 			? (viewda = { ...view.viewData, serviceUrl })
 			: (viewda = { title: view.title, serviceUrl });
-		console.log("THE VIEWDA", viewda);
+
 		res.render(view.view, viewda, (err, html) => {
 			if (err) {
-				self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");
-				self.pao.pa_wiLog(err);
+				// self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");
+				// self.pao.pa_wiLog(err);
 				res.render("main/500", { title: "Server error" }, (err, html) => {
 					if (err)
 						return resolve({
