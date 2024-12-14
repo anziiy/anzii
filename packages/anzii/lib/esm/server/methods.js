@@ -2,7 +2,6 @@
 /* eslint-disable no-unused-vars */
 export const init = function () {
 	this.adLog("Server has been initialised");
-	this.adLog("SERVER IS STARTING UP");
 
 	this.listens({
 		"config-server": this.handleConfigServer.bind(this),
@@ -53,9 +52,7 @@ export const runServer = function (data) {
 
 export const handleWriteServerRequestResponse = async function (data) {
 	const self = this;
-	// self.pao.pa_wiLog("THE DATA TO BE SENT TO CLIENT");
-	// self.pao.pa_wiLog(data.method);
-	// self.pao.pa_wiLog(data.method === "renderView");
+
 	if (data.method === "stream") {
 		return self.streamResponse(data);
 	} else if (data.method === "renderView") {
@@ -121,14 +118,14 @@ export const handleWriteServerRequestResponse = async function (data) {
 							title: "Page could not be found",
 						})
 						.then((html) => {
-							return data.res.status(200).send(html.html);
+							return data.res.status(400).send(html.html);
 						})
 						.catch((e) => {
-							return data.res.status(200).send(e.html);
+							return data.res.status(500).send(e.html);
 						});
 					break;
 				default:
-					data.res.type("txt").status(200).send("Text not found");
+					data.res.type("txt").status(400).send("Text not found");
 			}
 		} else {
 			data.res.status(200).send(data.data);
@@ -163,20 +160,14 @@ export const streamResponse = function (data) {
 		);
 	});
 	rStream.on("error", async function (e) {
-		// self.pao.pa_wiLog("THE ERROR READSTREAM");
-		// self.pao.pa_wiLog(e);
 		data.res.set("Content-Type", "application/json");
 		data.res.set("Connection", "close");
 		return data.res.status(404).send({ error: true, message: "Not found" });
-		// data.res.end();
+
 		// return  await self.log('SERVER HAS SENT A STREAM RESPONSE BACK TO THE CLIENT WITH ERROR')
 	});
 };
 export const getHtml = function (res, view) {
-	const self = this;
-	const pao = self.pao;
-	// self.pao.pa_wiLog("THE SET VIEW");
-	// self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
 		let serviceUrl = process.env.ANZII_APP_URL;
@@ -187,8 +178,6 @@ export const getHtml = function (res, view) {
 
 		res.render(view.view, viewda, (err, html) => {
 			if (err) {
-				// self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");
-				// self.pao.pa_wiLog(err);
 				res.render("main/500", { title: "Server error" }, (err, html) => {
 					if (err)
 						return resolve({
@@ -197,11 +186,8 @@ export const getHtml = function (res, view) {
 						});
 					return resolve({ html: html, success: true });
 				});
-				//   data.res.status(404).send({error: true, message: 'The requested view was not found'})
-				//   return self.pao.pa_wiLog('SERVER HAS SENT A FAILED RESPONSE BACK TO THE CLIENT::REGULAR')
 			} else {
 				return resolve({ html: html, success: true });
-				// return self.pao.pa_wiLog('SERVER HAS SENT A SUCCESSFULL RESPONSE BACK TO THE CLIENT::REGULAR')
 			}
 		});
 	});
