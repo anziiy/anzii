@@ -171,8 +171,8 @@ CORE.prototype.util = function () {
 		createFolderContent: function (source, target, ignore = null) {
 			return PILLAR.p_createFolderContent(source, target, ignore);
 		},
-		loadFile: function (filepath) {
-			return PILLAR.p_loadFile(filepath);
+		loadFile: function (filepath, all = false, checkExist = true) {
+			return PILLAR.p_loadFile(filepath, all, checkExist);
 		},
 		loadFileSync: function (filepath) {
 			return PILLAR.p_loadFileSync(filepath);
@@ -186,8 +186,8 @@ CORE.prototype.util = function () {
 		getMainFileName: function () {
 			return PILLAR.p_getMainFileName();
 		},
-		getRootDir: function () {
-			return PILLAR.p_getRootDir();
+		getRootDir: function (filename = null) {
+			return PILLAR.p_getRootDir(filename);
 		},
 
 		isExistingDir: function (filepath) {
