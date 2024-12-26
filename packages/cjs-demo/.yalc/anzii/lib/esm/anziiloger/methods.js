@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 export const init = function () {
 	this.setDebugger(this.constructor.name);
-	//   this.handleAnziilogerConfig()
-	//this.aLog({message: 'Anziilger has been initialised'})
 	this.listens({
 		"config-anziiloger": this.handleAnziilogerConfig.bind(this),
 		"anziiloger-log": this.handleLogRequest.bind(this),
@@ -13,9 +11,6 @@ export const handleLogRequest = function (data) {
 	const pao = self.pao;
 	const cliLogsSet = process.env.ANZII_SHOW_CLI_LOGS || "false";
 	const shouldShowCliLogs = cliLogsSet === "true" ? true : false;
-	// self.pao.pa_wiLog('HANDLELOGREQUEST')
-	// self.pao.pa_wiLog(data)
-	// self.pao.pa_wiLog(data.source)
 	if (pao.PROMPT.indexOf("cli") >= 0 && shouldShowCliLogs === false) return;
 	if (self.logger) {
 		switch (data.type) {
@@ -49,18 +44,7 @@ export const handleLogRequest = function (data) {
 };
 export const handleAnziilogerConfig = function (data) {
 	const self = this;
-	// self.pao.pa_wiLog('THE DEUGAS')
-	// self.pao.pa_wiLog(self.debugas)
 	const pao = self.pao;
-	// self.logger = data
-	// self.info({message: "Anzii is configuring logger",sync: true,source: 'Anziiloger'})
-	// self.pao.pa_wiLog('ANZII LOGGER IS CATCHING AN EVENT FROM CONFIG')
-	// self.pao.pa_wiLog(data)
-	// data.hasOwnProperty('transports')
-	//   ? pao.pa_isArray(data.transports)
-	// 	 ? self.defaultTransports.concat(data.transports)
-	// 	 : console.log('Config: invalid def..  ')
-	//   :''
 	let now = new Date();
 	self.logger = new self.winlo.createLogger({
 		transports: [
@@ -121,11 +105,7 @@ export const info = async function (log) {
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	// if(contains(log,'sync')){
-	// 	await self.logger.info(`${log.source}: ${log.message}`)
-	// }else{
-	// 	self.logger.info(`${log.source}: ${log.message}`)
-	// }
+
 	if (contains(log, "sync")) {
 		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
 			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
@@ -176,15 +156,6 @@ export const info = async function (log) {
 			// self.logger.debug(`${log.source}: ${log.message}`)
 		}
 	}
-	// if(self.debugas.hasOwnProperty(log.source.toLowerCase())){
-	// 	// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-	// 	// self.pao.pa_wiLog(self.debugas)
-	// 	await self.debugas[log.source.toLowerCase()](log.message)
-	// }else{
-	// 	await self.logger.info(`${log.source}: ${log.message}`)
-	// }
-	// self.log('THE INFO METHOD RECEIVES A CALL')
-	// self.log(log)
 };
 export const debug = async function (log) {
 	const self = this;
@@ -288,10 +259,10 @@ export const iLog = async function (log) {
 	//self.logger.error(`${log.source}: ${log.message}`)
 	// self.pao.pa_wiLog(process.env)
 	// if(process.env.ANZII_SHOW_DEBUG_LOGS && process.env.ANZII_SHOW_DEBUG_LOGS.trim().toLowerCase() === 'true') console.log(log.message)
-	if (!process.env.SHOW_ANZII_WI_LOGS) return;
-	if (process.env.SHOW_ANZII_WI_LOGS.trim().toLowerCase() !== "true") return;
+	if (!process.env.ANZII_SHOW_WILD_LOGS) return;
+	if (process.env.ANZII_SHOW_WILD_LOGS.trim().toLowerCase() !== "true") return;
 	self.pao.pa_wiLog("iLog:ANZIILOGER");
-	self.pao.pa_wiLog(process.env.SHOW_ANZII_WI_LOGS);
+	self.pao.pa_wiLog(process.env.ANZII_SHOW_WILD_LOGS);
 	console.log(log.message);
 	// const self = this
 	// const pao = self.pao

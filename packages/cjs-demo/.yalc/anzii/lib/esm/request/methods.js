@@ -23,7 +23,7 @@ export const handleRequestHandOver = function (data) {
 	const self = this;
 	self.infoSync("Handling Handed Request");
 	self.infoSync(data.req.originalUrl);
-	self.request.res = data.res;
+
 	let aliasList = self.routesAliasList;
 	let aliatikHandlers = self.aliatikHandlers;
 	let parsed = self.parseRequest(data.req);
@@ -63,7 +63,9 @@ export const handleRequestHandOver = function (data) {
 				type: `do-view-task`,
 				data: {
 					payload: self.requestData,
-					callback: self.taskerHandler.bind(self),
+					callback: (fail = null, success = null, method = null) => {
+						self.taskerHandler({ fail, res: data.res, success, method });
+					},
 				},
 			});
 		self.pao.pa_wiLog("none view should be rendered");
@@ -85,7 +87,9 @@ export const handleRequestHandOver = function (data) {
 				type: `do-view-task`,
 				data: {
 					payload: self.requestData,
-					callback: self.taskerHandler.bind(self),
+					callback: (fail = null, success = null, method = null) => {
+						self.taskerHandler({ fail, res: data.res, success, method });
+					},
 				},
 			});
 		return self.handlePathError();
@@ -189,6 +193,7 @@ export const handleRouterAliasList = function (data) {
 };
 export const handleRequestGlobalResponse = function (data) {
 	const self = this;
+	const res = self.requestData.request.res;
 	if (!data) {
 		self.handleByHandlerError();
 	} else {
@@ -196,7 +201,10 @@ export const handleRequestGlobalResponse = function (data) {
 			type: `handle-${self.requestData.handler}-task`,
 			data: {
 				payload: self.requestData,
-				callback: self.taskerHandler.bind(self),
+				callback: (fail = null, success = null, method = null) => {
+					console.log("THE REQUEST ID IN TASKER", res.R_ID);
+					self.taskerHandler({ fail, res, success, method });
+				},
 			},
 		});
 	}
@@ -231,7 +239,7 @@ export const isView = function (path, user = null) {
 				}
 			}
 		}
-		let parasList = Object.keys(user);
+		let parasList = user ? Object.keys(user) : [];
 		let parasString = "";
 		self.pao.pa_wiLog("THE PARALIST");
 		self.pao.pa_wiLog(parasList);
@@ -292,11 +300,12 @@ export const handleHandlerError = function () {
 	const self = this;
 	self.handleHandlerError();
 };
-export const writeResponse = function (data, method = "regular") {
+export const writeResponse = function (response) {
 	const self = this;
 	const pao = self.pao;
 	// self.pao.pa_wiLog('THE DATA IN WRITERESPONSE')
 	// self.pao.pa_wiLog(data)
+	let { data, method = "regular" } = response;
 	if (method === "regular") {
 		pao.pa_isString()
 			? (data = pao.pa_jsToJson({ text: data }))
@@ -304,31 +313,36 @@ export const writeResponse = function (data, method = "regular") {
 	}
 	self.emit({
 		type: "write-server-request-response",
-		data: { data: data, res: self.request.res, method: method },
+		data: { data: data, res: response.res, method: method },
 	});
 };
-export const taskerHandler = function (
-	fail = null,
-	success = null,
-	method = null,
-) {
+export const taskerHandler = function (handlerFeedback) {
 	const self = this;
+	const { fail = null, success = null, method = null } = handlerFeedback;
 	self.pao.pa_wiLog("THE TASKER HANDLER");
 	self.pao.pa_wiLog(fail);
 	self.pao.pa_wiLog(method);
 	if (fail) {
-		self.failureHandle({ error: true, message: fail });
+		self.failureHandle({
+			error: true,
+			message: fail,
+			res: handlerFeedback.res,
+		});
 	} else if (success) {
 		method
-			? self.successfullHandle(success, method)
-			: self.successfullHandle(success);
+			? self.successfullHandle({
+					data: success,
+					method,
+					res: handlerFeedback.res,
+			  })
+			: self.successfullHandle({ data: success, res: handlerFeedback.res });
 	}
 };
-export const successfullHandle = function (data, method) {
+export const successfullHandle = function (successResponseData) {
 	const self = this;
-	self.writeResponse(data, method);
+	self.writeResponse(successResponseData);
 };
-export const failureHandle = function (data) {
+export const failureHandle = function (errorResponseData) {
 	const self = this;
-	self.writeResponse(data);
+	self.writeResponse(errorResponseData);
 };
