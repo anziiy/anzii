@@ -399,59 +399,59 @@ CORE.prototype.sanna = function () {
 					// this.PILLAR.p_wiLog(mInsId)
 					pao.pa_notifyListen(evehandles, mId, mInsId);
 				},
-				log: function (message = "No message provided", type = "console") {
+				log: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: type };
+					let data = { message: lorgArgs, type: "console" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
-				logSync: function (message = "No message provided", type = "console") {
+				logSync: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: type };
-					data.source = self.getClassName();
-					data.sync = true;
-					self.emit({ type: "anziiloger-log", data: data });
-				},
-				info: function (message = "No message provided") {
-					const self = this;
-					let data = { message: message, type: "info" };
-					data.source = self.getClassName();
-					self.emit({ type: "anziiloger-log", data: data });
-				},
-				infoSync: function (message = "No message provided") {
-					const self = this;
-					let data = { message: message, type: "info" };
+					let data = { message: lorgArgs, type: "console" };
 					data.source = self.getClassName();
 					data.sync = true;
 					self.emit({ type: "anziiloger-log", data: data });
 				},
-				debug: function (message = "No message provided") {
+				info: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: "debug" };
+					let data = { message: lorgArgs, type: "info" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
-				warn: function (message = "No message provided") {
+				infoSync: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: "warn" };
+					let data = { message: lorgArgs, type: "info" };
+					data.source = self.getClassName();
+					data.sync = true;
+					self.emit({ type: "anziiloger-log", data: data });
+				},
+				debug: function (...lorgArgs) {
+					const self = this;
+					let data = { message: lorgArgs, type: "debug" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
-				error: function (message = "No message provided") {
+				warn: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: "error" };
+					let data = { message: lorgArgs, type: "warn" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
-				adLog: function (message = "No message provided") {
+				error: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: "adLog" };
+					let data = { message: lorgArgs, type: "error" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
-				wiLog: function (message = "No message provided") {
+				adLog: function (...lorgArgs) {
 					const self = this;
-					let data = { message: message, type: "wiLog" };
+					let data = { message: lorgArgs, type: "adLog" };
+					data.source = self.getClassName();
+					self.emit({ type: "anziiloger-log", data: data });
+				},
+				wiLog: function (...lorgArgs) {
+					const self = this;
+					let data = { message: lorgArgs, type: "wiLog" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
