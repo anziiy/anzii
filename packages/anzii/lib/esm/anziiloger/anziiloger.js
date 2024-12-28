@@ -39,6 +39,7 @@ class Anziiloger {
 		this.aLog = methods.aLog;
 		this.iLog = methods.iLog;
 		this.setDebugger = methods.setDebugger;
+		this.useColorsAndEnableDebugger = methods.useColorsAndEnableDebugger;
 	}
 }
 export default Anziiloger;

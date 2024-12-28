@@ -113,13 +113,7 @@ export const info = async function (log) {
 			self.iLog({ message: "Logging info sync with debugas" });
 			self.iLog({ message: log.message });
 			self.iLog({ message: self.debugas[log.source.toLowerCase()] });
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			!self.debugas[log.source.toLowerCase()].enabled &&
-			process?.env?.NODE_ENV?.toLowerCase() === "production"
-				? (self.debugas[log.source.toLowerCase()].enabled = true)
-				: "";
+			useColorsAndEnableDebugger(log);
 			await self.debugas[log.source.toLowerCase()](log.message);
 		} else {
 			try {
@@ -276,4 +270,15 @@ export const setDebugger = async function (mod) {
 	// self.pao.pa_wiLog('THE CURRETN MODULE IN ANZILOGGER')
 	// self.pao.pa_wiLog(mod)
 	self.debugas[name] = self.debugr(`anzii:${name}`);
+};
+
+export const useColorsAndEnableDebugger = function (log) {
+	const self = this;
+	!self.debugas[log.source.toLowerCase()].useColors
+		? (self.debugas[log.source.toLowerCase()].useColors = true)
+		: "";
+	!self.debugas[log.source.toLowerCase()].enabled &&
+	process?.env?.NODE_ENV?.toLowerCase() === "production"
+		? (self.debugas[log.source.toLowerCase()].enabled = true)
+		: "";
 };
