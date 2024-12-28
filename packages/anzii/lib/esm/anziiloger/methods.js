@@ -106,18 +106,17 @@ export const info = async function (log) {
 	const pao = self.pao;
 	const contains = pao.pa_contains;
 
-	contains(log, "sync") 
-	? self.runForDebuggerOrNone(log, "info") 
-	: self.runForDebuggerOrNone(log,"info", false)
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "info")
+		: self.runForDebuggerOrNone(log, "info", false);
 };
 export const debug = async function (log) {
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	contains(log, "sync") 
-	? self.runForDebuggerOrNone(log, "debug") 
-	: self.runForDebuggerOrNone(log,"debug", false)
-	
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "debug")
+		: self.runForDebuggerOrNone(log, "debug", false);
 };
 export const warn = async function (log) {
 	//const self = this
@@ -126,9 +125,9 @@ export const warn = async function (log) {
 	const pao = self.pao;
 	const contains = pao.pa_contains;
 
-	contains(log, "sync") 
-	? self.runForDebuggerOrNone(log, "warn") 
-	: self.runForDebuggerOrNone(log,"warn", false)
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "warn")
+		: self.runForDebuggerOrNone(log, "warn", false);
 };
 export const error = async function (log) {
 	//const self = this
@@ -190,7 +189,11 @@ export const useColorsAndEnableDebugger = function (log) {
 		? (self.debugas[log.source.toLowerCase()].enabled = true)
 		: "";
 };
-export const runForDebuggerOrNone = function (log,loggerType, isAsync=true) {
+export const runForDebuggerOrNone = async function (
+	log,
+	loggerType,
+	isAsync = true,
+) {
 	const self = this;
 
 	if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
@@ -200,21 +203,21 @@ export const runForDebuggerOrNone = function (log,loggerType, isAsync=true) {
 		self.iLog({ message: log.message });
 		self.iLog({ message: self.debugas[log.source.toLowerCase()] });
 		self.useColorsAndEnableDebugger(log);
-		isAsync 
-		? await self.debugas[log.source.toLowerCase()](log.message) 
-		: self.debugas[log.source.toLowerCase()](log.message);
-	
+		isAsync
+			? await self.debugas[log.source.toLowerCase()](...log.message)
+			: self.debugas[log.source.toLowerCase()](...log.message);
 	} else {
 		try {
 			self.iLog({ message: "Logging info sync" });
 			self.iLog({ message: log.source });
 			self.iLog({ message: log.message });
-			isAsync ? await self.logger[loggerType](`${log.source}: ${log.message}`) : self.logger[loggerType](`${log.source}: ${log.message}`);
+			isAsync
+				? await self.logger[loggerType](`${log.source}: ${log.message}`)
+				: self.logger[loggerType](`${log.source}: ${log.message}`);
 		} catch (e) {
 			self.iLog({ message: "Logging info::WITH ERROR" });
 			// self.iLog(e)
 			console.log(e);
 		}
 	}
-	
 };
