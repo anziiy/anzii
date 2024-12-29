@@ -171,6 +171,8 @@ export const setDebugger = async function (mod) {
 	const self = this;
 	let name = mod.toLowerCase();
 	self.debugas[name] = self.debugr(`anzii:${name}`);
+	self.debugas[name].enabled = true;
+	self.debugas[name].useColors = true;
 };
 
 export const useColorsAndEnableDebugger = function (log) {
@@ -191,15 +193,15 @@ export const runForDebuggerOrNone = async function (
 	const self = this;
 
 	if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-		self.useColorsAndEnableDebugger(log);
+		// self.useColorsAndEnableDebugger(log);
 		isAsync
 			? await self.debugas[log.source.toLowerCase()](...log.message)
 			: self.debugas[log.source.toLowerCase()](...log.message);
 	} else {
 		try {
 			isAsync
-				? await self.logger[loggerType](`${log.source}: ${log.message}`)
-				: self.logger[loggerType](`${log.source}: ${log.message}`);
+				? await self.logger[loggerType](`${log.source}:`, ...log.message)
+				: self.logger[loggerType](`${log.source}:`, ...log.message);
 		} catch (e) {
 			console.log(e);
 		}
