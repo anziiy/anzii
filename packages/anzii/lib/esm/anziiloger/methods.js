@@ -23,12 +23,12 @@ export const handleLogRequest = function (data) {
 			case "error":
 				self.error(data);
 				break;
-			case "adLog":
-				self.aLog(data);
-				break;
-			case "wiLog":
-				self.iLog(data);
-				break;
+			// case "adLog":
+			// 	self.aLog(data);
+			// 	break;
+			// case "wiLog":
+			// 	self.iLog(data);
+			// 	break;
 			default:
 				self.debug(data);
 		}
@@ -128,15 +128,13 @@ export const warn = async function (log) {
 		: self.runForDebuggerOrNone(log, "warn", false);
 };
 export const error = async function (log) {
-	//const self = this
-	//self.logger.error(`${log.source}: ${log.message}`)
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
 	if (contains(log, "sync")) {
-		await self.logger.error(`${log.source}: ${log.message}`);
+		await self.logger.error(`${log.source}:`, ...log.message);
 	} else {
-		self.logger.error(`${log.source}: ${log.message}`);
+		self.logger.error(`${log.source}:`, ...log.message);
 	}
 };
 export const aLog = async function (log) {
