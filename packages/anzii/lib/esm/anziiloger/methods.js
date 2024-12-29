@@ -119,8 +119,6 @@ export const debug = async function (log) {
 		: self.runForDebuggerOrNone(log, "debug", false);
 };
 export const warn = async function (log) {
-	//const self = this
-	//self.logger.warn(`${log.source}: ${log.message}`)
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
@@ -172,10 +170,6 @@ export const iLog = async function (log) {
 export const setDebugger = async function (mod) {
 	const self = this;
 	let name = mod.toLowerCase();
-	//console.log("THE DEBUGR",name)
-	// process.exit(1)
-	// self.pao.pa_wiLog('THE CURRETN MODULE IN ANZILOGGER')
-	// self.pao.pa_wiLog(mod)
 	self.debugas[name] = self.debugr(`anzii:${name}`);
 };
 
@@ -197,26 +191,16 @@ export const runForDebuggerOrNone = async function (
 	const self = this;
 
 	if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-		// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-		// self.pao.pa_wiLog(self.debugas)
-		self.iLog({ message: "Logging info sync with debugas" });
-		self.iLog({ message: log.message });
-		self.iLog({ message: self.debugas[log.source.toLowerCase()] });
 		self.useColorsAndEnableDebugger(log);
 		isAsync
 			? await self.debugas[log.source.toLowerCase()](...log.message)
 			: self.debugas[log.source.toLowerCase()](...log.message);
 	} else {
 		try {
-			self.iLog({ message: "Logging info sync" });
-			self.iLog({ message: log.source });
-			self.iLog({ message: log.message });
 			isAsync
 				? await self.logger[loggerType](`${log.source}: ${log.message}`)
 				: self.logger[loggerType](`${log.source}: ${log.message}`);
 		} catch (e) {
-			self.iLog({ message: "Logging info::WITH ERROR" });
-			// self.iLog(e)
 			console.log(e);
 		}
 	}
