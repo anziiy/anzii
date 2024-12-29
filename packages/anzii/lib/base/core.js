@@ -408,6 +408,7 @@ CORE.prototype.sanna = function () {
 				logSync: function (...lorgArgs) {
 					const self = this;
 					let data = { message: lorgArgs, type: "console" };
+					console.log("THE LOG SYNC", data.messaage, self.getClassName());
 					data.source = self.getClassName();
 					data.sync = true;
 					self.emit({ type: "anziiloger-log", data: data });
@@ -444,16 +445,16 @@ CORE.prototype.sanna = function () {
 					self.emit({ type: "anziiloger-log", data: data });
 				},
 				adLog: function (...lorgArgs) {
-					const self = this;
-					let data = { message: lorgArgs, type: "adLog" };
-					data.source = self.getClassName();
-					self.emit({ type: "anziiloger-log", data: data });
+					// const self = this;
+					// let data = { message: lorgArgs, type: "adLog" };
+					// data.source = self.getClassName();
+					// self.emit({ type: "anziiloger-log", data: data });
 				},
 				wiLog: function (...lorgArgs) {
-					const self = this;
-					let data = { message: lorgArgs, type: "wiLog" };
-					data.source = self.getClassName();
-					self.emit({ type: "anziiloger-log", data: data });
+					// const self = this;
+					// let data = { message: lorgArgs, type: "wiLog" };
+					// data.source = self.getClassName();
+					// self.emit({ type: "anziiloger-log", data: data });
 				},
 				getClassName: function () {
 					const pao = this.pao;
