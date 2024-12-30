@@ -27,25 +27,25 @@ export const handleRequestHandOver = function (data) {
 	let aliasList = self.routesAliasList;
 	let aliatikHandlers = self.aliatikHandlers;
 	let parsed = self.parseRequest(data.req);
-	self.pao.pa_wiLog("THE ALIATIKS");
-	self.pao.pa_wiLog(parsed);
-	self.pao.pa_wiLog(aliasList);
-	self.pao.pa_wiLog(aliatikHandlers);
+	self.debug("THE ALIATIKS");
+	self.debug(parsed);
+	self.debug(aliasList);
+	self.debug(aliatikHandlers);
 	data.req.uploads
 		? parsed.user
 			? (parsed.user.uploads = data.req.uploads)
 			: (parsed.user = { uploads: data.req.uploads })
 		: "";
-	// self.pao.pa_wiLog('parsed')
-	// self.pao.pa_wiLog(parsed.url.trim().split('/'))
+	// self.debug('parsed')
+	// self.debug(parsed.url.trim().split('/'))
 	let handler = parsed.handler;
 	aliasList.indexOf(handler) >= 0
 		? (handler = aliatikHandlers[aliasList.indexOf(handler)])
 		: "";
 	self.handler = handler;
 	if (handler && handler.trim() !== "") {
-		self.pao.pa_wiLog("THERES A VALID HANDLE");
-		self.pao.pa_wiLog(self.handler);
+		self.debug("THERES A VALID HANDLE");
+		self.debug(self.handler);
 		let uza = parsed.user || null;
 		self.requestData = {
 			parsed: parsed,
@@ -53,9 +53,9 @@ export const handleRequestHandOver = function (data) {
 			request: { req: data.req, res: data.res, next: data.next },
 		};
 		uza ? (self.requestData.user = uza) : "";
-		self.pao.pa_wiLog(self.views);
-		self.pao.pa_wiLog(!self.views || self.views.length === 0);
-		self.pao.pa_wiLog(self.isView(data.req.originalUrl, uza));
+		self.debug(self.views);
+		self.debug(!self.views || self.views.length === 0);
+		self.debug(self.isView(data.req.originalUrl, uza));
 		if (!self.views || self.views.length === 0)
 			return self.emit({ type: "request-global-request", data: handler });
 		if (self.isView(data.req.originalUrl, uza))
@@ -68,12 +68,12 @@ export const handleRequestHandOver = function (data) {
 					},
 				},
 			});
-		self.pao.pa_wiLog("none view should be rendered");
+		self.debug("none view should be rendered");
 		return self.emit({ type: "request-global-request", data: handler });
 	} else {
 		// console.log("THERE IS NOT HANDLER", self.views);
-		self.pao.pa_wiLog("THEre is no handler");
-		self.pao.pa_wiLog(self.handler);
+		self.debug("THEre is no handler");
+		self.debug(self.handler);
 		if (!self.views || self.views.length === 0) return self.handlePathError();
 		let uza = parsed.user || null;
 		self.requestData = {
@@ -97,12 +97,12 @@ export const handleRequestHandOver = function (data) {
 };
 export const parseRequest = function (req) {
 	const self = this;
-	self.pao.pa_wiLog("The req");
-	self.pao.pa_wiLog(req.body);
-	self.pao.pa_wiLog(req.query);
-	self.pao.pa_wiLog(req.params);
-	// self.pao.pa_wiLog('THE REQUEST BODY')
-	// self.pao.pa_wiLog(req.body)
+	self.debug("The req");
+	self.debug(req.body);
+	self.debug(req.query);
+	self.debug(req.params);
+	// self.debug('THE REQUEST BODY')
+	// self.debug(req.body)
 	let requiredData = { url: req.originalUrl };
 	let url =
 		requiredData.url.indexOf("/") === 0
@@ -110,40 +110,40 @@ export const parseRequest = function (req) {
 			: requiredData.url;
 	let isPath = url.indexOf("/") > 0 ? true : false;
 	if (req.query && Object.keys(req.query).length > 0) {
-		self.pao.pa_wiLog("THE QUERY");
-		self.pao.pa_wiLog(req.query);
+		self.debug("THE QUERY");
+		self.debug(req.query);
 		requiredData.user = req.query;
 		let urlFragments = url.split("?");
 		if (isPath) {
 			let pathFrags = urlFragments[0].split("/");
-			self.pao.pa_wiLog("THE PATH FRAGS");
-			self.pao.pa_wiLog(pathFrags);
+			self.debug("THE PATH FRAGS");
+			self.debug(pathFrags);
 			requiredData.handler = pathFrags[0];
 		} else {
-			self.pao.pa_wiLog("THE REMAINING CONTENT AFTER SPLIT OF ?");
-			self.pao.pa_wiLog(urlFragments);
+			self.debug("THE REMAINING CONTENT AFTER SPLIT OF ?");
+			self.debug(urlFragments);
 			requiredData.handler = urlFragments[0];
 		}
 	} else if (req.params && Object.keys(req.params).length > 0) {
-		self.pao.pa_wiLog("THE PARAMS");
-		self.pao.pa_wiLog(req.params);
+		self.debug("THE PARAMS");
+		self.debug(req.params);
 		requiredData.user = req.params;
 		if (isPath) {
 			let pathFrags = url.split("/");
-			self.pao.pa_wiLog("THE PATH FRAGS");
-			self.pao.pa_wiLog(pathFrags);
+			self.debug("THE PATH FRAGS");
+			self.debug(pathFrags);
 			requiredData.handler = pathFrags[0];
 		} else {
 			requiredData.handler = url;
 		}
 	} else if (req.body && Object.keys(req.body).length > 0) {
-		self.pao.pa_wiLog("THE REQUEST BODY");
-		self.pao.pa_wiLog(req.body);
+		self.debug("THE REQUEST BODY");
+		self.debug(req.body);
 		requiredData.user = req.body;
 		if (isPath) {
 			let pathFrags = url.split("/");
-			self.pao.pa_wiLog("THE PATH FRAGS");
-			self.pao.pa_wiLog(pathFrags);
+			self.debug("THE PATH FRAGS");
+			self.debug(pathFrags);
 			requiredData.handler = pathFrags[0];
 		} else {
 			requiredData.handler = url;
@@ -152,8 +152,8 @@ export const parseRequest = function (req) {
 		requiredData.user = {};
 		if (isPath) {
 			let pathFrags = url.split("/");
-			self.pao.pa_wiLog("THE PATH FRAGS");
-			self.pao.pa_wiLog(pathFrags);
+			self.debug("THE PATH FRAGS");
+			self.debug(pathFrags);
 			requiredData.handler = pathFrags[0];
 			delete requiredData.user;
 		} else {
@@ -185,8 +185,8 @@ export const handlePathError = function () {
 };
 export const handleRouterAliasList = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("Router ALIATIKHANDLERS WITH DATA:");
-	self.pao.pa_wiLog(data);
+	self.debug("Router ALIATIKHANDLERS WITH DATA:");
+	self.debug(data);
 	// self.writeResponse({error: true,type: 'ServerError',code: 502,message: 'The requested task[handler] could not be completed'})
 	self.routesAliasList = data.aliasList;
 	self.aliatikHandlers = data.handlers;
@@ -212,18 +212,18 @@ export const handleRequestGlobalResponse = function (data) {
 export const isView = function (path, user = null) {
 	const self = this;
 	let views = self.views;
-	self.pao.pa_wiLog("THE VIEW PATH");
-	self.pao.pa_wiLog(path);
-	self.pao.pa_wiLog(user);
-	self.pao.pa_wiLog(views);
-	// self.pao.pa_wiLog('.extention check status')
-	//  self.pao.pa_wiLog(path.indexOf('.'))
+	self.debug("THE VIEW PATH");
+	self.debug(path);
+	self.debug(user);
+	self.debug(views);
+	// self.debug('.extention check status')
+	//  self.debug(path.indexOf('.'))
 	// if(path.indexOf('.') >= 0) return false
 	if (!user && path.trim() === "/home") {
-		self.pao.pa_wiLog("THE PARSED USsER");
-		self.pao.pa_wiLog(self.requestData);
-		self.pao.pa_wiLog(path);
-		self.pao.pa_wiLog(views.indexOf(path) >= 0);
+		self.debug("THE PARSED USsER");
+		self.debug(self.requestData);
+		self.debug(path);
+		self.debug(views.indexOf(path) >= 0);
 		self.requestData.parsed.derivedUrl = "/home";
 		if (views.indexOf(path) >= 0) return true;
 		return false;
@@ -241,24 +241,24 @@ export const isView = function (path, user = null) {
 		}
 		let parasList = user ? Object.keys(user) : [];
 		let parasString = "";
-		self.pao.pa_wiLog("THE PARALIST");
-		self.pao.pa_wiLog(parasList);
+		self.debug("THE PARALIST");
+		self.debug(parasList);
 		parasList.forEach((para, i) => {
 			i === 0 ? (parasString = `:${para}`) : (parasString += `/:${para}`);
 		});
-		self.pao.pa_wiLog("thE PARARSTRING");
-		self.pao.pa_wiLog(parasString);
+		self.debug("thE PARARSTRING");
+		self.debug(parasString);
 		for (let v = 0; v < views.length; v++) {
 			if (views[v].indexOf(parasString) > 0) {
 				let viewPath = views[v].substr(0, views[v].indexOf(parasString));
 				let comparePath = viewPath + parasString;
-				self.pao.pa_wiLog("EXTRACTED VIEW PATH");
-				self.pao.pa_wiLog(viewPath);
-				self.pao.pa_wiLog(comparePath);
-				self.pao.pa_wiLog(path);
-				self.pao.pa_wiLog(path.indexOf(viewPath));
+				self.debug("EXTRACTED VIEW PATH");
+				self.debug(viewPath);
+				self.debug(comparePath);
+				self.debug(path);
+				self.debug(path.indexOf(viewPath));
 				if (path.indexOf(viewPath) >= 0) {
-					self.pao.pa_wiLog("Theviewpath matched");
+					self.debug("Theviewpath matched");
 					self.requestData.parsed.derivedUrl = comparePath;
 					return true;
 				} else {
@@ -303,8 +303,8 @@ export const handleHandlerError = function () {
 export const writeResponse = function (response) {
 	const self = this;
 	const pao = self.pao;
-	// self.pao.pa_wiLog('THE DATA IN WRITERESPONSE')
-	// self.pao.pa_wiLog(data)
+	// self.debug('THE DATA IN WRITERESPONSE')
+	// self.debug(data)
 	let { data, method = "regular" } = response;
 	if (method === "regular") {
 		pao.pa_isString()
@@ -319,9 +319,9 @@ export const writeResponse = function (response) {
 export const taskerHandler = function (handlerFeedback) {
 	const self = this;
 	const { fail = null, success = null, method = null } = handlerFeedback;
-	self.pao.pa_wiLog("THE TASKER HANDLER");
-	self.pao.pa_wiLog(fail);
-	self.pao.pa_wiLog(method);
+	self.debug("THE TASKER HANDLER");
+	self.debug(fail);
+	self.debug(method);
 	if (fail) {
 		self.failureHandle({
 			error: true,

@@ -1,4 +1,5 @@
 import async from "async";
+import debug from "debug";
 import fs from "fs";
 import { createRequire } from "node:module";
 import os from "os";
@@ -6,6 +7,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import util from "util";
 import * as uuid from "uuid";
+
+const pillarDebug = debug("anzii:pillar");
+pillarDebug.enabled = true;
+pillarDebug.useColors = true;
 const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -211,9 +216,9 @@ export const p_getMainFileName = function () {
 	// ext = filename.slice(nameIndex,filename.length)
 	return null;
 };
-export const p_getRootDir = function () {
+export const p_getRootDir = function (filename = null) {
 	// let filename = __filename;
-	let dir = path.dirname(__filename);
+	let dir = path.dirname(filename || __filename);
 	return dir;
 };
 
@@ -349,10 +354,8 @@ export const p_saveToFile = function (fileToSaveTo, contents) {
 	// console.log("saveToFile", writePath);
 	fs.writeFileSync(writePath, contents, "utf8");
 };
-export function p_wiLog(message) {
-	if (!process.env.ANZII_SHOW_WILD_LOGS) return;
-	if (process.env.ANZII_SHOW_WILD_LOGS.trim().toLowerCase() === "false") return;
-	console.log(message);
+export function p_wiLog(...message) {
+	pillarDebug(message);
 }
 // export const p_getMainFileName = moduleExports.p_getMainFileName;
 // export const p_getRootDir = moduleExports.p_getRootDir;
@@ -831,10 +834,10 @@ export const p_createFolderContent = function (
 		}
 	});
 };
-export const p_loadFile = function (filepath) {
+export const p_loadFile = function (filepath, all = false, checkExist = true) {
 	return new Promise((resolve, reject) => {
-		this.p_wiLog(`THE FILEPATH load,${filepath}`);
-		if (!p_isExistingDir(filepath))
+		this.p_wiLog(`THE FILEPATH load`, filepath);
+		if (checkExist && !p_isExistingDir(filepath))
 			return reject({
 				code: "FILE_PATH_ERROR",
 				message: "File path does not exist",
@@ -873,11 +876,15 @@ export const p_loadFile = function (filepath) {
 		import(filepath)
 			.then((moduleFound) => {
 				// console.log("THE FOUND MODULE", moduleFound);
-				let foundFileContent = moduleFound?.default || moduleFound;
+				// let foundFileContent = moduleFound?.default || moduleFound;
+				let foundFileContent = all
+					? moduleFound
+					: moduleFound?.default || moduleFound;
 				resolve(foundFileContent);
+				// resolve(foundFileContent);
 			})
 			.catch((importERR) => {
-				// console.log("IMPORT ERROR", importERR);
+				console.log("IMPORT ERROR", importERR);
 				try {
 					const readFile = p_loadFileSync(filepath);
 					this.p_wiLog(`THE READ FILE, ${JSON.stringify(readFile)}`);

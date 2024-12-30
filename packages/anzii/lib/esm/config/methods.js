@@ -1,10 +1,8 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 import path from "path";
 export const init = function () {
-	this.adLog("Config has been initialised");
 	this.setLogNamespaces();
 	this.getConfigFile().then((resolvedValue) => {
-		this.adLog(`THE resolved ${resolvedValue}`);
 		this.doBefore();
 	});
 	this.listens({
@@ -21,22 +19,17 @@ export const getConfigFile = function () {
 	const pao = self.pao;
 	const loadFile = pao.pa_loadFile;
 
-	//const testFile = require("/Users/surprisemashele/Documents/Development/frameworks/test.jsx")
-	//const testFile = require("../../../../test.jsx")
-	// const testFile = require("./test.jsx")
-	//console.log("Got file", testFile)
-
 	return new Promise((resolve) => {
-		loadFile(path.resolve("./", ".config.js"))
+		loadFile(path.resolve(process.cwd(), ".config.js"))
 			.then((foundFile) => {
-				self.pao.pa_wiLog(
-					`Console.log fOUNDfiLE, ${JSON.stringify(foundFile)}`,
-				);
+				// self.debug(
+				// 	`Console.log fOUNDfiLE, ${JSON.stringify(foundFile)}`,
+				// );
 				self.config = foundFile;
 				resolve(true);
 			})
 			.catch((err) => {
-				self.pao.pa_wiLog(`The Call Is NOT FOUND", ${JSON.stringify(err)}`);
+				// self.debug(`The Call Is NOT FOUND", ${JSON.stringify(err)}`);
 				self.config = null;
 				resolve(true);
 			});
@@ -70,8 +63,8 @@ export const configure = function () {
 	const isAnziiInitiateManually =
 		(anziiKickoffManually && anziiKickoffManually === "true") || null;
 
-	self.pao.pa_wiLog(`THE CONFIG IS APP CLI: ${isAppCli}`);
-	self.pao.pa_wiLog(`THE CONFIG initi ${initializeCliWithServer}`);
+	self.debug(`THE CONFIG IS APP CLI: ${isAppCli}`);
+	self.debug(`THE CONFIG initi ${initializeCliWithServer}`);
 
 	if (initializeCliWithServer || (isAnziiInitiateManually && !self.config)) {
 		self.configLogger();
@@ -85,16 +78,16 @@ export const enviroment = function () {
 	const self = this;
 	let envObserver = self.envObserver;
 	// let supportsColor = self.supportsColor
-	// self.pao.pa_wiLog('THE CURRENT ENVIROMENT')
-	// self.pao.pa_wiLog(envObserver)
+	// self.debug('THE CURRENT ENVIROMENT')
+	// self.debug(envObserver)
 	// if (supportsColor.stdout) {
-	// 	self.pao.pa_wiLog('Terminal stdout supports color');
+	// 	self.debug('Terminal stdout supports color');
 	// }
 	// if (supportsColor.stdout.has256) {
-	// 	self.pao.pa_wiLog('Terminal stdout supports 256 colors');
+	// 	self.debug('Terminal stdout supports 256 colors');
 	// }
 	// if (supportsColor.stderr.has16m) {
-	// 	self.pao.pa_wiLog('Terminal stderr supports 16 million colors (truecolor)')
+	// 	self.debug('Terminal stderr supports 16 million colors (truecolor)')
 	// }
 	if (self.envObserver.has("enviroment")) {
 		if (self.aliases[envObserver?.enviroment]) {
@@ -103,19 +96,19 @@ export const enviroment = function () {
 			if (envCofig?.database) {
 				let clients = [];
 				let db = envCofig.database;
-				// self.pao.pa_wiLog('THE DB')
-				// self.pao.pa_wiLog(db)
+				// self.debug('THE DB')
+				// self.debug(db)
 				for (let c in db) {
-					// self.pao.pa_wiLog('THE VALUE Of C')
-					// self.pao.pa_wiLog(c)
-					// self.pao.pa_wiLog(db[c])
+					// self.debug('THE VALUE Of C')
+					// self.debug(c)
+					// self.debug(db[c])
 					clients.push({
 						name: c,
 						connect: db[c].connect,
 					});
 				}
-				// self.pao.pa_wiLog('THE DATABASE CLIENTS')
-				// self.pao.pa_wiLog(clients)
+				// self.debug('THE DATABASE CLIENTS')
+				// self.debug(clients)
 				self.emit({
 					type: `config-dman`,
 					data: { clients: clients },
@@ -126,10 +119,10 @@ export const enviroment = function () {
 				});
 			}
 			if (envObserver.has("appOrphic")) {
-				// self.pao.pa_wiLog('THE JWT appOrphic')
-				// self.pao.pa_wiLog(envObserver)
-				// self.pao.pa_wiLog(envObserver.appOrphic)
-				// self.pao.pa_wiLog(envObserver.appOrphic.flaDev)
+				// self.debug('THE JWT appOrphic')
+				// self.debug(envObserver)
+				// self.debug(envObserver.appOrphic)
+				// self.debug(envObserver.appOrphic.flaDev)
 				self.emit({
 					type: "save-jwt-key",
 					data: { key: envObserver.appOrphic["flaDev"] },
@@ -145,12 +138,12 @@ export const enviroment = function () {
 		}
 	}
 	// let db = self.envObserver.get('dev')
-	// self.pao.pa_wiLog(db)
-	// self.pao.pa_wiLog(db.database.mysql.connect.user)
+	// self.debug(db)
+	// self.debug(db.database.mysql.connect.user)
 };
 export const handleManualConfig = function (data = null) {
 	const self = this;
-	self.pao.pa_wiLog(
+	self.debug(
 		`MANUAL SERVER TRIGGER ACTIVATED,
 		${data?.payload?.configs}`,
 	);
@@ -174,11 +167,11 @@ export const runAppConfig = function (manualConfig = null) {
 		let { compiler, wepackMiddlewares, webpackConfig } = payload;
 		const { webpackDevMiddleware, webpackHotMiddleware } = wepackMiddlewares;
 
-		// self.pao.pa_wiLog("THE CONFIG");
-		// self.pao.pa_wiLog(JSON.stringify(config));
-		// self.pao.pa_wiLog(`runAPPcoNFIG", ${JSON.stringify(manualConfig)}`);
-		// self.pao.pa_wiLog(`THE APP CONFIG", ${JSON.stringify(self.config)}`);
-		// self.pao.pa_wiLog(`THE COMPILEr", ${manualConfig?.payload?.webpackConfig}`);
+		// self.debug("THE CONFIG");
+		// self.debug(JSON.stringify(config));
+		// self.debug(`runAPPcoNFIG", ${JSON.stringify(manualConfig)}`);
+		// self.debug(`THE APP CONFIG", ${JSON.stringify(self.config)}`);
+		// self.debug(`THE COMPILEr", ${manualConfig?.payload?.webpackConfig}`);
 
 		/* The code immediately after this comment should be re-organized 
       it's just using a quick dirty approach to test some logic
@@ -222,6 +215,10 @@ export const runAppConfig = function (manualConfig = null) {
 		};
 	}
 
+	/**
+	 *
+	 *
+	 */
 	if (!self.config) {
 		self.emit({ type: "config-system", data: { workers: 1, spawn: true } });
 		// if (manualConfig)
@@ -243,9 +240,13 @@ export const runAppConfig = function (manualConfig = null) {
 			: self.emit({ type: "config-system", data: { workers: 1, spawn: true } });
 
 		for (let c in config) {
-			self.pao.pa_wiLog(`THE C IN CONFIG", ${c}`);
-			self.pao.pa_wiLog("The module in Config");
-			self.pao.pa_wiLog(c);
+			self.debug(`THE C IN CONFIG", ${c}`);
+			self.debug("The module in Config");
+			self.debug(c);
+			/*
+			 This section of the code should be refactoured such so that server event should be the last to be
+			 sent out. This starts kicks off the server operations such as listening to server requests
+			*/
 			if (c === "server") {
 				serverConfig = config[c];
 				isServerConfig = true;
@@ -273,48 +274,36 @@ export const runAppConfig = function (manualConfig = null) {
 					});
 				}
 			}
-			if (c !== "logger" || c !== "views") {
+			/**
+			 *
+			 * This section of the code along with the server section above should be refactored
+			 */
+			if (c !== "logger" && c !== "views" && c !== "server") {
 				self.emit({
 					type: `config-${c}`,
 					data: config[c],
 				});
-				// c === 'domain'
-				//     ? (self.emit({ type: 'config-domain-resources', data: manualConfig ? manualConfig : null }))
-				//     : '';
 			}
 		}
 
+		/**
+		 *
+		 * This section of the code along with the server section above should be refactored
+		 */
 		self.emit({ type: "config-domain-resources", data: null }); // to be re-organized
-		self.pao.pa_wiLog(`isServer Value", ${isServerConfig}`);
-		if (!isServerConfig) {
+		self.debug(`isServer Value", ${isServerConfig}`);
+		if (isServerConfig) {
 			self.emit({
 				type: `config-server`,
 				data: serverConfig,
 			}); // TO be re-organized
 		}
 	}
-
-	// const theWatcher = manualConfig?.payload?.compiler.watch(
-	//  {
-	//     // Example
-	//     aggregateTimeout: 300,
-	//     poll: undefined,
-	//   },
-	//   (err, stats)=>{
-
-	//     console.log("THE WEBPACK HAS BEEN MANUALLY TRIGGERED",err)
-	//     console.log("THE STATS",stats.asserts)
-	// })
-	// process.on("beforeExit",()=>{
-	//     theWatcher.close((rr)=>{
-	//         console.log("THE WEBPACK WATCHER HAS BEEN CLOSES",rr)
-	//     })
-	// })
 };
 export const configLogger = function () {
 	const self = this;
 	if (self.config?.logger) {
-		// self.pao.pa_wiLog('THE LOGGER IS THE FIRST MODULE TO GET CONFIG')
+		// self.debug('THE LOGGER IS THE FIRST MODULE TO GET CONFIG')
 		self.emit({
 			type: `config-anziiloger`,
 			data: self.config.logger,
@@ -333,18 +322,11 @@ export const doBefore = function () {
 
 	loadFile(path.resolve("./", "package.json"))
 		.then((foundFile) => {
-			let packageJSON = foundFile;
-			self.pao.pa_wiLog(`THE package.json", ${JSON.stringify(packageJSON)}`);
 			self.configure();
 		})
 		.catch((err) => {
-			self.pao.pa_wiLog(`No pACKAGE.JSON WAS FOUND", ${JSON.stringify(err)}`);
 			self.configure();
 		});
-	// console.log("DoBefore in action")
-	// const packageJSON =  fs.readFileSync('./package.json');
-	// console.log("The package.json",packageJSON)
-	// self.configure()
 };
 export const configReady = function () {
 	const self = this;

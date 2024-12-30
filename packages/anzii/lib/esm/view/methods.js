@@ -11,8 +11,8 @@ export const handleConfigView = function (data) {
 	const self = this;
 	let routes = [];
 	let handlers = null;
-	self.pao.pa_wiLog("views data from config");
-	self.pao.pa_wiLog(data);
+	self.debug("views data from config");
+	self.debug(data);
 	data instanceof Array
 		? (routes = data)
 		: ((routes = data.routes), (handlers = data.handlers));
@@ -23,11 +23,11 @@ export const handleConfigView = function (data) {
 				route.viewso.indexOf("/") >= 0
 					? (handlerView = route.viewso.split("/")[1])
 					: (handlerView = route.viewso);
-				self.pao.pa_wiLog("THE VIEW HANDLER");
-				self.pao.pa_wiLog(route.viewso.indexOf("/"));
-				// self.pao.pa_wiLog(route.viewso.indexOf('/'))
-				// self.pao.pa_wiLog(handlers[handlerView])
-				self.pao.pa_wiLog(handlerView);
+				self.debug("THE VIEW HANDLER");
+				self.debug(route.viewso.indexOf("/"));
+				// self.debug(route.viewso.indexOf('/'))
+				// self.debug(handlers[handlerView])
+				self.debug(handlerView);
 				if (route.viewty === "template") {
 					if (!self.views) {
 						handlers &&
@@ -148,14 +148,14 @@ export const handleViewTask = async function (data) {
 	const { parsed } = payload;
 	const { user } = payload;
 	const view = parsed.derivedUrl || parsed.url;
-	self.pao.pa_wiLog("THE VIEW DATA");
-	self.pao.pa_wiLog(data);
+	self.debug("THE VIEW DATA");
+	self.debug(data);
 	self.infoSync("HANDLING VIEW TASK");
 	self.callback = data.callback;
 	let checkViewStatus = self.checkViewType(view);
 	if (checkViewStatus) {
 		if (checkViewStatus.type === "template") {
-			self.pao.pa_wiLog("about to render template view");
+			self.debug("about to render template view");
 			if (self.validView.handler) {
 				let viewData = await self.validView.handler(user);
 				viewData.title = self.validView.title;
@@ -202,8 +202,8 @@ export const handleViewTask = async function (data) {
 export const checkViewType = function (view) {
 	const self = this;
 	let views = self.views;
-	self.pao.pa_wiLog("CHECKVIEWTYPE");
-	self.pao.pa_wiLog(views);
+	self.debug("CHECKVIEWTYPE");
+	self.debug(views);
 	if (!views) return null;
 	if (views.templates)
 		if (self.isTemplateView(views.templates, view)) return { type: "template" };
@@ -216,8 +216,8 @@ export const checkViewType = function (view) {
 export const isTemplateView = function (views, view) {
 	const self = this;
 	let isValidView = views.filter((vu, i) => vu.match === view);
-	self.pao.pa_wiLog("ISVALID AS FILTERED");
-	self.pao.pa_wiLog(isValidView);
+	self.debug("ISVALID AS FILTERED");
+	self.debug(isValidView);
 	if (isValidView && isValidView.length === 1) {
 		self.validView = isValidView[0];
 		return true;
@@ -227,9 +227,9 @@ export const isTemplateView = function (views, view) {
 };
 export const isModularView = function (views, view) {
 	const self = this;
-	self.pao.pa_wiLog("THE VIEWS IN MODULAR");
-	self.pao.pa_wiLog(views);
-	self.pao.pa_wiLog(view);
+	self.debug("THE VIEWS IN MODULAR");
+	self.debug(views);
+	self.debug(view);
 	let isValidView = views.filter((vu, i) => vu.match === view);
 	self.wiLog();
 	if (isValidView && isValidView.length === 1) {

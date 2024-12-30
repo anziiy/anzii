@@ -8,14 +8,14 @@ export const init = function () {
 };
 export const handleConfigRouter = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE HANDLE CONFIG ROUTER MODULE");
-	self.pao.pa_wiLog(data);
+	self.debug("THE HANDLE CONFIG ROUTER MODULE");
+	self.debug(data);
 	self.routes = data;
 };
 export const handleRouterMiddleware = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE ROUTER MIDDLEWARE");
-	self.pao.pa_wiLog(data);
+	self.debug("THE ROUTER MIDDLEWARE");
+	self.debug(data);
 	self.routerMiddleware = data.middleware;
 };
 export const handleAttachRoutes = function (data) {
@@ -141,8 +141,8 @@ export const renderRoute = function (r) {
 		path: r.path,
 		handOver: self.handOver,
 	};
-	// self.pao.pa_wiLog('THE ROUTE MIDDLEWARE')
-	// self.pao.pa_wiLog(self.routerMiddleware.public)
+	// self.debug('THE ROUTE MIDDLEWARE')
+	// self.debug(self.routerMiddleware.public)
 	if (r.middlewares) {
 		if (self.routerMiddleware && self.routerMiddleware[r.type]) {
 			self.middlewareType(r.type, r.middlewares);
@@ -180,7 +180,7 @@ export const renderRoute = function (r) {
 	}
 };
 export const appendRouter = function (r) {
-	// self.pao.pa_wiLog('THE APPENDROUTER')
+	// self.debug('THE APPENDROUTER')
 	// self.infoSync('THE CURRENT ROUTER')
 	// self.infoSync(r)
 	if (r.middleware) {
@@ -204,8 +204,8 @@ export const appendRouter = function (r) {
 };
 export const middlewareType = function (type, middlewares) {
 	const self = this;
-	// self.pao.pa_wiLog('THE MIDDLEWARETYP MIDDLEWARES')
-	// self.pao.pa_wiLog(middlewares)
+	// self.debug('THE MIDDLEWARETYP MIDDLEWARES')
+	// self.debug(middlewares)
 	// self.infoSync('The Router middlewares')
 	// self.infoSync(middlewares)
 	middlewares.forEach((m) => {
@@ -268,9 +268,9 @@ export const outOfRouterContext = async function (req, res) {
 		// let folderPath = `${self.pao.pa_getWorkingFolder()}${self.path.sep}views${
 		// 	self.path.sep
 		// }index.html`;
-		// self.pao.pa_wiLog(`folder path: ${folderPath}`);
-		// self.pao.pa_wiLog(`working folder: ${self.pao.pa_getWorkingFolder()}`);
-		// self.pao.pa_wiLog(
+		// self.debug(`folder path: ${folderPath}`);
+		// self.debug(`working folder: ${self.pao.pa_getWorkingFolder()}`);
+		// self.debug(
 		// 	`IS EXISTING FOLDER VIEWS: ${self.pao.pa_isExistingDir(
 		// 		folderPath.trim(),
 		// 	)}`,
@@ -318,7 +318,7 @@ export const outOfRouterContext = async function (req, res) {
 export async function handOver(req, res, next) {
 	const self = this;
 
-	await self.pao.pa_wiLog("THE CAUGHT REQUEST INSIDE ROUTER::END POINT HIT");
+	await self.debug("THE CAUGHT REQUEST INSIDE ROUTER::END POINT HIT");
 	self.infoSync(next);
 	let reqresID = self.pao.pa_generateUniqueID();
 	req.R_ID = reqresID;
@@ -328,9 +328,9 @@ export async function handOver(req, res, next) {
 			req.method
 		} AND URL OF: ${req.originalUrl}`,
 	);
-	await self.pao.pa_wiLog(req.originalUrl);
-	await self.pao.pa_wiLog(req.params);
-	await self.pao.pa_wiLog(req.body);
+	await self.debug(req.originalUrl);
+	await self.debug(req.params);
+	await self.debug(req.body);
 	return self.emit({
 		type: "request-handover",
 		data: { req: req, res: res, next: next },

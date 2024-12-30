@@ -13,7 +13,7 @@ methods.handleDoFileRoutes = async function (data) {
 	// console.log("HANDLE FILE ROUTES DATA", data);
 	const { payload } = data;
 	const { path: filePaths } = payload;
-	self.pao.pa_wiLogs("FILE PATHS", filePaths);
+	self.debugs("FILE PATHS", filePaths);
 	const pagesPaths = self.getPages(`${filePaths.appPagesFolder}/**/*.jsx`);
 	console.log("PAGES PATHS", pagesPaths);
 	console.log(
