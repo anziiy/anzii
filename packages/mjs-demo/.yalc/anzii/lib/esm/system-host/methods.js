@@ -6,7 +6,6 @@ const __filename = fileURLToPath(import.meta.url);
 // const __dirname = path.dirname(__filename);
 
 export const init = function () {
-	console.log("THE OPENSSL has been initialised");
 	this.listens({
 		"add-host-domain": this.handleAddHostDomain.bind(this),
 		"remove-host-domain": this.handleRemoveHostDomain.bind(this),

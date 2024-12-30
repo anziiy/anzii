@@ -9,9 +9,7 @@ export const init = function () {
 export const handleLogRequest = function (data) {
 	const self = this;
 	const pao = self.pao;
-	const cliLogsSet = process.env.ANZII_SHOW_CLI_LOGS || "false";
-	const shouldShowCliLogs = cliLogsSet === "true" ? true : false;
-	if (pao.PROMPT.indexOf("cli") >= 0 && shouldShowCliLogs === false) return;
+
 	if (self.logger) {
 		switch (data.type) {
 			case "info":
@@ -23,12 +21,12 @@ export const handleLogRequest = function (data) {
 			case "error":
 				self.error(data);
 				break;
-			case "adLog":
-				self.aLog(data);
-				break;
-			case "wiLog":
-				self.iLog(data);
-				break;
+			// case "adLog":
+			// 	self.aLog(data);
+			// 	break;
+			// case "wiLog":
+			// 	self.iLog(data);
+			// 	break;
 			default:
 				self.debug(data);
 		}
@@ -36,7 +34,7 @@ export const handleLogRequest = function (data) {
 		console.log(
 			data.source,
 			"logged message: ",
-			data.message,
+			...data.message,
 			" of type ",
 			data.type,
 		);
@@ -106,139 +104,34 @@ export const info = async function (log) {
 	const pao = self.pao;
 	const contains = pao.pa_contains;
 
-	if (contains(log, "sync")) {
-		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-			// self.pao.pa_wiLog(self.debugas)
-			self.iLog({ message: "Logging info sync with debugas" });
-			self.iLog({ message: log.message });
-			self.iLog({ message: self.debugas[log.source.toLowerCase()] });
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			!self.debugas[log.source.toLowerCase()].enabled &&
-			process?.env?.NODE_ENV?.toLowerCase() === "production"
-				? (self.debugas[log.source.toLowerCase()].enabled = true)
-				: "";
-			await self.debugas[log.source.toLowerCase()](log.message);
-		} else {
-			try {
-				self.iLog({ message: "Logging info sync" });
-				self.iLog({ message: log.source });
-				self.iLog({ message: log.message });
-				await self.logger.debug(`${log.source}: ${log.message}`);
-			} catch (e) {
-				self.iLog({ message: "Logging info::WITH ERROR" });
-				// self.iLog(e)
-				console.log(e);
-			}
-		}
-	} else {
-		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-			// self.pao.pa_wiLog(self.debugas)
-			// console.log('debugs has property',log.source)
-			self.iLog({ message: "Logging info sync with debugas::NONESYNC" });
-			self.iLog({ message: self.debugas[log.source.toLowerCase()] });
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			self.debugas[log.source.toLowerCase()](log.message);
-		} else {
-			try {
-				self.iLog({ message: "Logging info sync::noneSync" });
-				self.iLog({ message: log.source });
-				self.logger.debug(`${log.source}: ${log.message}`);
-			} catch (e) {
-				self.iLog({ message: "Logging infoNONESYNC::WITH ERROR" });
-				console.log(e);
-			}
-			// self.logger.debug(`${log.source}: ${log.message}`)
-		}
-	}
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "info")
+		: self.runForDebuggerOrNone(log, "info", false);
 };
 export const debug = async function (log) {
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	if (contains(log, "sync")) {
-		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-			// self.pao.pa_wiLog(self.debugas)
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			await self.debugas[log.source.toLowerCase()](log.message);
-		} else {
-			await self.logger.debug(`${log.source}: ${log.message}`);
-		}
-	} else {
-		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-			// self.pao.pa_wiLog(self.debugas)
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			self.debugas[log.source.toLowerCase()](log.message);
-		} else {
-			self.logger.debug(`${log.source}: ${log.message}`);
-		}
-	}
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "debug")
+		: self.runForDebuggerOrNone(log, "debug", false);
 };
 export const warn = async function (log) {
-	//const self = this
-	//self.logger.warn(`${log.source}: ${log.message}`)
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	// if(contains(log,'sync')){
-	// 	await self.logger.warn(`${log.source}: ${log.message}`)
-	// }else{
-	// 	self.logger.warn(`${log.source}: ${log.message}`)
-	// }
-	if (contains(log, "sync")) {
-		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED')
-			// self.pao.pa_wiLog(self.debugas)
-			self.iLog({ message: "Logging warn sync with debugas" });
-			self.iLog(self.debugas[log.source.toLowerCase()]);
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			await self.debugas[log.source.toLowerCase()](log.message);
-		} else {
-			self.iLog({ message: "Logging warn sync" });
-			self.iLog({ message: log.source });
-			await self.logger.warn(`${log.source}: ${log.message}`);
-		}
-	} else {
-		if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
-			// self.pao.pa_wiLog('THE DEBUG MODULE IS USED'})
-			// self.pao.pa_wiLog(self.debugas)
-			self.iLog({ message: "Logging warn sync with debugas:NONESYNC" });
-			self.iLog({ message: self.debugas[log.source.toLowerCase()] });
-			!self.debugas[log.source.toLowerCase()].useColors
-				? (self.debugas[log.source.toLowerCase()].useColors = true)
-				: "";
-			self.debugas[log.source.toLowerCase()](log.message);
-		} else {
-			self.iLog({ message: "Logging warn NONESYNC" });
-			self.iLog({ message: log.source });
-			self.logger.warn(`${log.source}: ${log.message}`);
-		}
-	}
+
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "warn")
+		: self.runForDebuggerOrNone(log, "warn", false);
 };
 export const error = async function (log) {
-	//const self = this
-	//self.logger.error(`${log.source}: ${log.message}`)
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	if (contains(log, "sync")) {
-		await self.logger.error(`${log.source}: ${log.message}`);
-	} else {
-		self.logger.error(`${log.source}: ${log.message}`);
-	}
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "error")
+		: self.runForDebuggerOrNone(log, "error", false);
 };
 export const aLog = async function (log) {
 	const self = this;
@@ -271,9 +164,40 @@ export const iLog = async function (log) {
 export const setDebugger = async function (mod) {
 	const self = this;
 	let name = mod.toLowerCase();
-	//console.log("THE DEBUGR",name)
-	// process.exit(1)
-	// self.pao.pa_wiLog('THE CURRETN MODULE IN ANZILOGGER')
-	// self.pao.pa_wiLog(mod)
 	self.debugas[name] = self.debugr(`anzii:${name}`);
+	self.debugas[name].enabled = true;
+	self.debugas[name].useColors = true;
+};
+
+export const useColorsAndEnableDebugger = function (log) {
+	const self = this;
+	!self.debugas[log.source.toLowerCase()].useColors
+		? (self.debugas[log.source.toLowerCase()].useColors = true)
+		: "";
+	!self.debugas[log.source.toLowerCase()].enabled &&
+	process?.env?.NODE_ENV?.toLowerCase() === "production"
+		? (self.debugas[log.source.toLowerCase()].enabled = true)
+		: "";
+};
+export const runForDebuggerOrNone = async function (
+	log,
+	loggerType,
+	isAsync = true,
+) {
+	const self = this;
+
+	if (self.debugas.hasOwnProperty(log.source.toLowerCase())) {
+		// self.useColorsAndEnableDebugger(log);
+		isAsync
+			? await self.debugas[log.source.toLowerCase()](...log.message)
+			: self.debugas[log.source.toLowerCase()](...log.message);
+	} else {
+		try {
+			isAsync
+				? await self.logger[loggerType](`${log.source}:`, ...log.message)
+				: self.logger[loggerType](`${log.source}:`, ...log.message);
+		} catch (e) {
+			console.log(e);
+		}
+	}
 };

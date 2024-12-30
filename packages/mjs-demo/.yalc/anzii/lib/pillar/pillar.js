@@ -1,4 +1,5 @@
 import async from "async";
+import debug from "debug";
 import fs from "fs";
 import { createRequire } from "node:module";
 import os from "os";
@@ -6,6 +7,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import util from "util";
 import * as uuid from "uuid";
+
+const pillarDebug = debug("anzii:pillar");
+pillarDebug.enabled = true;
+pillarDebug.useColors = true;
 const require = createRequire(import.meta.url);
 
 const __filename = fileURLToPath(import.meta.url);
@@ -349,10 +354,8 @@ export const p_saveToFile = function (fileToSaveTo, contents) {
 	// console.log("saveToFile", writePath);
 	fs.writeFileSync(writePath, contents, "utf8");
 };
-export function p_wiLog(message) {
-	if (!process.env.ANZII_SHOW_WILD_LOGS) return;
-	if (process.env.ANZII_SHOW_WILD_LOGS.trim().toLowerCase() === "false") return;
-	console.log(message);
+export function p_wiLog(...message) {
+	pillarDebug(message);
 }
 // export const p_getMainFileName = moduleExports.p_getMainFileName;
 // export const p_getRootDir = moduleExports.p_getRootDir;
@@ -833,7 +836,7 @@ export const p_createFolderContent = function (
 };
 export const p_loadFile = function (filepath, all = false, checkExist = true) {
 	return new Promise((resolve, reject) => {
-		this.p_wiLog(`THE FILEPATH load,${filepath}`);
+		this.p_wiLog(`THE FILEPATH load`, filepath);
 		if (checkExist && !p_isExistingDir(filepath))
 			return reject({
 				code: "FILE_PATH_ERROR",
