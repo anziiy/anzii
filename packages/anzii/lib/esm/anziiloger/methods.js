@@ -9,9 +9,7 @@ export const init = function () {
 export const handleLogRequest = function (data) {
 	const self = this;
 	const pao = self.pao;
-	const cliLogsSet = process.env.ANZII_SHOW_CLI_LOGS || "false";
-	const shouldShowCliLogs = cliLogsSet === "true" ? true : false;
-	if (pao.PROMPT.indexOf("cli") >= 0 && shouldShowCliLogs === false) return;
+
 	if (self.logger) {
 		switch (data.type) {
 			case "info":
@@ -36,7 +34,7 @@ export const handleLogRequest = function (data) {
 		console.log(
 			data.source,
 			"logged message: ",
-			data.message,
+			...data.message,
 			" of type ",
 			data.type,
 		);
@@ -131,11 +129,9 @@ export const error = async function (log) {
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	if (contains(log, "sync")) {
-		await self.logger.error(`${log.source}:`, ...log.message);
-	} else {
-		self.logger.error(`${log.source}:`, ...log.message);
-	}
+	contains(log, "sync")
+		? self.runForDebuggerOrNone(log, "error")
+		: self.runForDebuggerOrNone(log, "error", false);
 };
 export const aLog = async function (log) {
 	const self = this;
