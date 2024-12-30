@@ -3,6 +3,7 @@ function CORE(lib) {
 	this.modules = {};
 	this.globalModules = [];
 	this.PROMPT = this.PILLAR.PROMPT;
+
 	// this.parent = this
 } // End of the CORE class
 CORE.prototype.createModule = function (
@@ -360,6 +361,11 @@ CORE.prototype.sanna = function () {
 					if (name && name.toLowerCase() === "anziiloger") return;
 					comp.error = self.sanna().modules.addiks.error.bind(comp);
 				},
+				logIndicator: function (comp) {
+					comp.logIndicator = self
+						.sanna()
+						.modules.addiks.logIndicator.bind(comp);
+				},
 				adLog: function (comp) {
 					comp.adLog = self.sanna().modules.addiks.adLog.bind(comp);
 				},
@@ -378,6 +384,7 @@ CORE.prototype.sanna = function () {
 			addiks: {
 				emit: function (data) {
 					const pao = this.pao;
+
 					// self.log(self.constructor.name,'is emitting event:',data.type,'with data: ')
 					pao.pa_notifyEvent({
 						type: data.type,
@@ -401,14 +408,16 @@ CORE.prototype.sanna = function () {
 				},
 				log: function (...lorgArgs) {
 					const self = this;
+					if (!self.logIndicator().shouldShowStandardLogs) return;
 					let data = { message: lorgArgs, type: "console" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
 				logSync: function (...lorgArgs) {
 					const self = this;
+
+					if (!self.logIndicator().shouldShowStandardLogs) return;
 					let data = { message: lorgArgs, type: "console" };
-					console.log("THE LOG SYNC", data.messaage, self.getClassName());
 					data.source = self.getClassName();
 					data.sync = true;
 					self.emit({ type: "anziiloger-log", data: data });
@@ -428,18 +437,21 @@ CORE.prototype.sanna = function () {
 				},
 				debug: function (...lorgArgs) {
 					const self = this;
+					if (!self.logIndicator().shouldShowDebugLogs) return;
 					let data = { message: lorgArgs, type: "debug" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
 				warn: function (...lorgArgs) {
 					const self = this;
+					if (!self.logIndicator().shouldShowWarningLogs) return;
 					let data = { message: lorgArgs, type: "warn" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
 				},
 				error: function (...lorgArgs) {
 					const self = this;
+					if (!self.logIndicator().shouldShowErrorLogs) return;
 					let data = { message: lorgArgs, type: "error" };
 					data.source = self.getClassName();
 					self.emit({ type: "anziiloger-log", data: data });
@@ -455,6 +467,19 @@ CORE.prototype.sanna = function () {
 					// let data = { message: lorgArgs, type: "wiLog" };
 					// data.source = self.getClassName();
 					// self.emit({ type: "anziiloger-log", data: data });
+				},
+				logIndicator: function (...lorgArgs) {
+					// const self = this;
+					const self = this;
+					const pao = self.pao;
+
+					return pao.LogIndicators;
+
+					// if (process.env?.NODE_ENV && process.env.NODE_ENV === "development") {
+					// 	return true;
+					// } else {
+					// 	return false;
+					// }
 				},
 				getClassName: function () {
 					const pao = this.pao;
