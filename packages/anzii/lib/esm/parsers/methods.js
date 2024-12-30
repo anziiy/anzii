@@ -6,7 +6,7 @@ export const init = function () {
 };
 export const handleShareMiddleware = function () {
 	const self = this;
-	self.pao.pa_wiLog("HANLDE SHARE MIDDLEWARE EVENT HAS OCCURED");
+	self.debug("HANLDE SHARE MIDDLEWARE EVENT HAS OCCURED");
 	self.emit({
 		type: "add-ext-middleware",
 		data: {

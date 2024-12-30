@@ -1,5 +1,4 @@
 export const init = function () {
-	this.adLog("IO has been initialised");
 	this.startIOShell();
 };
 export const startIOShell = function () {

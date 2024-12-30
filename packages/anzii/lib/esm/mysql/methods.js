@@ -9,36 +9,36 @@ export const init = function () {
 export const handleMysqlDataRequest = function (data) {
 	const self = this;
 	const pao = self.pao;
-	// self.pao.pa_wiLog("Handling Mysql Data Request")
-	// self.pao.pa_wiLog(data.table)
-	// self.pao.pa_wiLog(data.outComehandler)
-	// self.pao.pa_wiLog(data.opi)
-	// self.pao.pa_wiLog(data)
+	// self.debug("Handling Mysql Data Request")
+	// self.debug(data.table)
+	// self.debug(data.outComehandler)
+	// self.debug(data.opi)
+	// self.debug(data)
 	if (
 		!pao.pa_contains(data, ["conn", "table", "opi", "query", "outComehandler"])
 	) {
-		self.pao.pa_wiLog("Data request operations failed");
+		self.debug("Data request operations failed");
 		return data.outComehandler({ message: "Database operation failed" });
 	} else {
 		if (!pao.pa_isObject(data.conn)) {
-			self.pao.pa_wiLog("THE connection is not object");
+			self.debug("THE connection is not object");
 		} else {
 			if (!pao.pa_isString(data.table)) {
-				self.pao.pa_wiLog("THE TABLE NAME IS NOT A STRING");
+				self.debug("THE TABLE NAME IS NOT A STRING");
 			} else {
 				if (data.opi.trim() !== "deletemultiple" && !self[data.opi]) {
-					self.pao.pa_wiLog("DATA.OPI IS NOT CONTAINED AS FUNCTION");
-					self.pao.pa_wiLog(data.opi.trim() !== "deletemultiple");
-					self.pao.pa_wiLog(data.opi);
+					self.debug("DATA.OPI IS NOT CONTAINED AS FUNCTION");
+					self.debug(data.opi.trim() !== "deletemultiple");
+					self.debug(data.opi);
 					return data.outComehandler({
 						message: "The specified operation is not supported",
 					});
 				} else {
-					self.pao.pa_wiLog("THE CODE GOES THIS FAR");
+					self.debug("THE CODE GOES THIS FAR");
 					if (data.opi === "insert") {
 						data.opi = "insertOne";
 						self[data.opi](data);
-						self.pao.pa_wiLog("this runs after opi finishes");
+						self.debug("this runs after opi finishes");
 					} else if (data.opi === "find") {
 						// data.opi = 'findOne'
 						self[data.opi](data);
@@ -89,8 +89,8 @@ export const insertOne = function (insert) {
 			const conn = insert.conn;
 			const connector = insert.connector;
 			const query = insert.query;
-			self.pao.pa_wiLog("THE INSERT OBJECT");
-			self.pao.pa_wiLog(insert);
+			self.debug("THE INSERT OBJECT");
+			self.debug(insert);
 			let sql = `INSERT INTO ?? (??) VALUES(?)`;
 			let queryAttributes = [
 				insert.table,
@@ -98,25 +98,25 @@ export const insertOne = function (insert) {
 				[null, ...query.values],
 			];
 			sql = connector.format(sql, queryAttributes);
-			self.pao.pa_wiLog("THE SQL STATEMENT");
-			self.pao.pa_wiLog(sql);
+			self.debug("THE SQL STATEMENT");
+			self.debug(sql);
 			self.infoSync("THE HANDLER");
 			self.infoSync(handler);
 			//  let sql = `INSERT INTO ${data.table} SET ?`
 			conn.query(sql, function (e, r) {
-				self.pao.pa_wiLog("INSERT RESULT");
-				self.pao.pa_wiLog(r);
-				self.pao.pa_wiLog(e);
+				self.debug("INSERT RESULT");
+				self.debug(r);
+				self.debug(e);
 				if (e) return handler(e, null);
 				r.user = insert.values;
-				self.pao.pa_wiLog(r.user);
+				self.debug(r.user);
 				self.info("THE HANDLER IN QUERY");
 				self.infoSync(handler);
 				handler(null, r);
 			});
 		} catch (e) {
-			self.pao.pa_wiLog("CAUTH ERROR");
-			self.pao.pa_wiLog(e);
+			self.debug("CAUTH ERROR");
+			self.debug(e);
 			self.infoSync("THE CAUTH ERROR");
 			self.infoSync(e);
 			// eslint-disable-next-line no-undef
@@ -152,7 +152,7 @@ export const insertMany = function (insert) {
 					}
 				});
 			});
-			self.pao.pa_wiLog("bulk insert completed");
+			self.debug("bulk insert completed");
 			// eslint-disable-next-line no-undef
 			handler(null, result);
 		} catch (e) {
@@ -166,11 +166,11 @@ export const find = async function (findiks) {
 	const pao = self.pao;
 	// self.infoSync('THE FINDIKS')
 	// self.infoSync(findiks)
-	// self.pao.pa_wiLog('fIND.FINDIKS')
-	// self.pao.pa_wiLog(findiks.query.length)
+	// self.debug('fIND.FINDIKS')
+	// self.debug(findiks.query.length)
 	// if(findiks.query.length > 0){ return findiks.outComehandler({message: 'ERROR IN MYSQL.FIND.METHOD'})}
-	// self.pao.pa_wiLog('THE DATA IN FINDONE')
-	// self.pao.pa_wiLog(findiks)
+	// self.debug('THE DATA IN FINDONE')
+	// self.debug(findiks)
 	if (!pao.pa_isObject(findiks)) {
 		throw new Error("Argument:: findiks, is required");
 	} else {
@@ -216,15 +216,15 @@ export const find = async function (findiks) {
 					let sql = "";
 					let attribs = null;
 					let sqliks = self.queryTemplate(self.queryOptions(find), "select");
-					//  self.pao.pa_wiLog('THE SQLKIKS OBJECT FIND')
-					//  self.pao.pa_wiLog(sqliks)
+					//  self.debug('THE SQLKIKS OBJECT FIND')
+					//  self.debug(sqliks)
 					attribs = [sqliks.attribs.from.table];
 					sql = sqliks.statement;
 					let queryAttributes = attribs;
-					// self.pao.pa_wiLog('THE SQL BEFORE FORMAT')
+					// self.debug('THE SQL BEFORE FORMAT')
 					sql = connector.format(sql, queryAttributes);
-					// self.pao.pa_wiLog(sql)
-					// self.pao.pa_wiLog(sql)
+					// self.debug(sql)
+					// self.debug(sql)
 					self.infoSync("THE SQL AFTER FORMATTING");
 					self.infoSync(sql);
 					// self.infoSync('CHECK IF CONN.QUERY IS A PROMISE')
@@ -284,15 +284,15 @@ export const find = async function (findiks) {
 					// self.infoSync('THE QUERYRESULT')
 					// self.infoSync(queryRes)
 					// conn.query(sql,function(e,r,f){
-					//       // self.pao.pa_wiLog('THE QUERY IS COMPLETED WITH RESULTS')
-					//       // self.pao.pa_wiLog(e)
-					//       // self.pao.pa_wiLog(r)
-					//       // self.pao.pa_wiLog(typeof r)
-					//       // self.pao.pa_wiLog(f)
-					//       // self.pao.pa_wiLog(r instanceof Array)
-					//       // self.pao.pa_wiLog(pao.pa_isArray(r))
-					//       // self.pao.pa_wiLog(r.length)
-					//       // self.pao.pa_wiLog('After R evaluation')
+					//       // self.debug('THE QUERY IS COMPLETED WITH RESULTS')
+					//       // self.debug(e)
+					//       // self.debug(r)
+					//       // self.debug(typeof r)
+					//       // self.debug(f)
+					//       // self.debug(r instanceof Array)
+					//       // self.debug(pao.pa_isArray(r))
+					//       // self.debug(r.length)
+					//       // self.debug('After R evaluation')
 					//       // self.infoSync('THE rESULT HAS BEEN RETRIEVED')
 					//       // self.infoSync(r)
 					//       // self.infoSync(result)
@@ -328,8 +328,8 @@ export const find = async function (findiks) {
 					//           result = r
 					//         }
 					//       if(q === query.length - 1){
-					//         self.pao.pa_wiLog('THE LOOP IS COMPLETE WITH DATA:')
-					//         self.pao.pa_wiLog(result)
+					//         self.debug('THE LOOP IS COMPLETE WITH DATA:')
+					//         self.debug(result)
 					//         self.infoSync('THE CURRENT LAST RESULT')
 					//          self.infoSync(q)
 					//          self.infoSync(r)
@@ -348,8 +348,8 @@ export const find = async function (findiks) {
 					//     }
 					//   })
 				} catch (e) {
-					// self.pao.pa_wiLog('AN ERROR OCCURED IN FIND ONE ')
-					// self.pao.pa_wiLog(e)
+					// self.debug('AN ERROR OCCURED IN FIND ONE ')
+					// self.debug(e)
 					findiks.select ? handler(e, null, findiks.select) : handler(e, null);
 					return;
 				}
@@ -362,11 +362,11 @@ export const findOne = async function (findiks) {
 	const pao = self.pao;
 	// self.infoSync('THE FINDIKS')
 	// self.infoSync(findiks)
-	// self.pao.pa_wiLog('fIND.FINDIKS')
-	// self.pao.pa_wiLog(findiks.query.length)
+	// self.debug('fIND.FINDIKS')
+	// self.debug(findiks.query.length)
 	// if(findiks.query.length > 0){ return findiks.outComehandler({message: 'ERROR IN MYSQL.FIND.METHOD'})}
-	// self.pao.pa_wiLog('THE DATA IN FINDONE')
-	// self.pao.pa_wiLog(findiks)
+	// self.debug('THE DATA IN FINDONE')
+	// self.debug(findiks)
 	if (!pao.pa_isObject(findiks)) {
 		throw new Error("Argument:: findiks, is required");
 	} else {
@@ -406,15 +406,15 @@ export const findOne = async function (findiks) {
 				let sql = "";
 				let attribs = null;
 				let sqliks = self.queryTemplate(self.queryOptions(find), "select");
-				//  self.pao.pa_wiLog('THE SQLKIKS OBJECT FIND')
-				//  self.pao.pa_wiLog(sqliks)
+				//  self.debug('THE SQLKIKS OBJECT FIND')
+				//  self.debug(sqliks)
 				attribs = [sqliks.attribs.from.table];
 				sql = sqliks.statement;
 				let queryAttributes = attribs;
-				// self.pao.pa_wiLog('THE SQL BEFORE FORMAT')
+				// self.debug('THE SQL BEFORE FORMAT')
 				sql = connector.format(sql, queryAttributes);
-				// self.pao.pa_wiLog(sql)
-				// self.pao.pa_wiLog(sql)
+				// self.debug(sql)
+				// self.debug(sql)
 				self.infoSync("THE SQL AFTER FORMATTING");
 				self.infoSync(sql);
 				// self.infoSync('CHECK IF CONN.QUERY IS A PROMISE')
@@ -468,8 +468,8 @@ export const findOne = async function (findiks) {
 					return;
 				}
 			} catch (e) {
-				// self.pao.pa_wiLog('AN ERROR OCCURED IN FIND ONE ')
-				// self.pao.pa_wiLog(e)
+				// self.debug('AN ERROR OCCURED IN FIND ONE ')
+				// self.debug(e)
 				// eslint-disable-next-line no-undef
 				connection.release();
 				findiks.select ? handler(e, null, findiks.select) : handler(e, null);
@@ -511,8 +511,8 @@ export const findIterateItemPromise = function (conn, sql) {
 };
 export const updateOne = function (updatiks) {
 	const self = this;
-	self.pao.pa_wiLog("THE UPDATIKS");
-	self.pao.pa_wiLog(updatiks);
+	self.debug("THE UPDATIKS");
+	self.debug(updatiks);
 	self.infoSync("THE UPDATIKS");
 	self.infoSync(updatiks.update);
 	const pao = self.pao;
@@ -520,7 +520,7 @@ export const updateOne = function (updatiks) {
 	let connector = updatiks.connector;
 	let handler = updatiks.outComehandler;
 	let update = { table: updatiks.table, ...updatiks.query };
-	//self.pao.pa_wiLog(update)
+	//self.debug(update)
 	// eslint-disable-next-line no-empty
 	if (!pao.pa_isObject(updatiks)) {
 	} else {
@@ -528,17 +528,17 @@ export const updateOne = function (updatiks) {
 			let sql = "";
 			let attribs = null;
 			let sqliks = self.queryTemplate(self.queryOptions(update), "update");
-			self.pao.pa_wiLog("THE SQLKIKS OBJECT UPDATE");
-			self.pao.pa_wiLog(sqliks);
+			self.debug("THE SQLKIKS OBJECT UPDATE");
+			self.debug(sqliks);
 			attribs = [sqliks.attribs.from.table];
 			sql = sqliks.statement;
 			let queryAttributes = attribs;
-			self.pao.pa_wiLog("THE SQL BEFORE FORMAT");
-			self.pao.pa_wiLog(sql);
+			self.debug("THE SQL BEFORE FORMAT");
+			self.debug(sql);
 			// self.infoSync('THE CONNECTION METHODS')
 			// self.infoSync(conn)
 			sql = connector.format(sql, queryAttributes);
-			self.pao.pa_wiLog(sql);
+			self.debug(sql);
 			self.infoSync("THE UPDATE SQL");
 			self.infoSync(sql);
 			conn.query(sql, function (e, r) {
@@ -578,7 +578,7 @@ export const updateMany = function (update) {
 					}
 				});
 			});
-			self.pao.pa_wiLog("bulk update completed");
+			self.debug("bulk update completed");
 			// eslint-disable-next-line no-undef
 			handler(null, result);
 		} catch (e) {
@@ -589,14 +589,14 @@ export const updateMany = function (update) {
 };
 export const updateandtake = async function (updateAndTake) {
 	const self = this;
-	self.pao.pa_wiLog("THE UPDATIKANDTAKE");
-	self.pao.pa_wiLog(updateAndTake);
+	self.debug("THE UPDATIKANDTAKE");
+	self.debug(updateAndTake);
 	const pao = self.pao;
 	let conn = updateAndTake.conn;
 	let connector = updateAndTake.connector;
 	let handler = updateAndTake.outComehandler;
 	let updateTake = updateAndTake.query;
-	//self.pao.pa_wiLog(update)
+	//self.debug(update)
 	// eslint-disable-next-line no-empty
 	if (!pao.pa_isObject(updateAndTake)) {
 	} else {
@@ -617,8 +617,8 @@ export const updateandtake = async function (updateAndTake) {
 							});
 					} else {
 						// handler({updated: false,taken: taken})
-						self.pao.pa_wiLog("NO CHANGED ROWS IN A MULTIPLE UPDATE");
-						self.pao.pa_wiLog(options);
+						self.debug("NO CHANGED ROWS IN A MULTIPLE UPDATE");
+						self.debug(options);
 						self
 							.take(options, conn, updateTake.conditions, connector)
 							.then((taken) => {
@@ -649,8 +649,8 @@ export const updateandtake = async function (updateAndTake) {
 };
 export const insertandtake = async function (insertAndTake) {
 	const self = this;
-	self.pao.pa_wiLog("THE INSERTANDTAKE");
-	self.pao.pa_wiLog(insertAndTake);
+	self.debug("THE INSERTANDTAKE");
+	self.debug(insertAndTake);
 	// self.infoSync('THe insertAnd Take')
 	// self.infoSync(insertAndTake)
 	const pao = self.pao;
@@ -659,20 +659,20 @@ export const insertandtake = async function (insertAndTake) {
 	let insert = insertAndTake.query.insert;
 	let takeQuery = insertAndTake.query.take;
 	let connector = insertAndTake.connector;
-	//self.pao.pa_wiLog(update)
+	//self.debug(update)
 	// eslint-disable-next-line no-empty
 	if (!pao.pa_isObject(insertAndTake)) {
 	} else {
 		try {
 			let insertTakeHandle = async function (error = null, inserted = null) {
-				await self.pao.pa_wiLog("THE INSERTED RECORD UPDATE");
-				await self.pao.pa_wiLog(error);
-				await self.pao.pa_wiLog(inserted);
-				await self.pao.pa_wiLog(self.SEARCH);
+				await self.debug("THE INSERTED RECORD UPDATE");
+				await self.debug(error);
+				await self.debug(inserted);
+				await self.debug(self.SEARCH);
 				!takeQuery.conditions
 					? (takeQuery.conditions = [`id ISEQUAL ${inserted.insertId}`])
 					: "";
-				await self.pao.pa_wiLog(takeQuery);
+				await self.debug(takeQuery);
 				let take = {};
 				take.conn = conn;
 				take.query = takeQuery;
@@ -702,8 +702,8 @@ export const insertandtake = async function (insertAndTake) {
 };
 export const deleteandtake = async function (deleteAndTake) {
 	const self = this;
-	self.pao.pa_wiLog("THE DELETEANDTAKE");
-	self.pao.pa_wiLog(deleteAndTake);
+	self.debug("THE DELETEANDTAKE");
+	self.debug(deleteAndTake);
 	const pao = self.pao;
 	let conn = deleteAndTake.conn;
 	let handler = deleteAndTake.outComehandler;
@@ -714,31 +714,31 @@ export const deleteandtake = async function (deleteAndTake) {
 		remove = deleteAndTake.query.remove;
 		takeQuery = deleteAndTake.query.take;
 	}
-	//self.pao.pa_wiLog(update)
+	//self.debug(update)
 	// eslint-disable-next-line no-empty
 	if (!pao.pa_isObject(deleteAndTake)) {
 	} else {
 		try {
 			let deleteTakeHandle = async function (error = null, deleted = null) {
-				await self.pao.pa_wiLog("THE deleted RECORD UPDATE");
-				await self.pao.pa_wiLog(error);
-				await self.pao.pa_wiLog(deleted);
+				await self.debug("THE deleted RECORD UPDATE");
+				await self.debug(error);
+				await self.debug(deleted);
 				if (!takeQuery) {
 					handler(null, { deleted: deleted });
 				} else {
 					!takeQuery.conditions
 						? (takeQuery.conditions = remove.conditions)
 						: "";
-					await self.pao.pa_wiLog(takeQuery);
+					await self.debug(takeQuery);
 					let take = {};
 					take.conn = conn;
 					take.connector = connector;
 					take.query = takeQuery;
 					// eslint-disable-next-line no-unused-vars
 					take.outComehandler = (e = null, taken) => {
-						self.pao.pa_wiLog("DELETED AND TAKEN OPERATION");
-						self.pao.pa_wiLog(deleted);
-						self.pao.pa_wiLog(taken);
+						self.debug("DELETED AND TAKEN OPERATION");
+						self.debug(deleted);
+						self.debug(taken);
 						handler(null, { deleted: deleted, taken: taken });
 					};
 					self.search(take);
@@ -762,8 +762,8 @@ export const updateJoinTemplate = function (options) {
 	// WHERE ${options.from.condition}
 	// `
 	const self = this;
-	self.pao.pa_wiLog("UPDATE OPTIONS");
-	self.pao.pa_wiLog(options);
+	self.debug("UPDATE OPTIONS");
+	self.debug(options);
 	let sqlAttribs = {};
 	sqlAttribs.attribs = { from: options.from, tables: options.tables };
 	switch (options.length) {
@@ -814,23 +814,23 @@ export const multiTableUpdate = async function (options, conn, connector) {
 	const contains = pao.pa_contains;
 	return new Promise((resolve, reject) => {
 		try {
-			// self.pao.pa_wiLog('THE SQLKIKS OBJECT UPDATE')
-			// self.pao.pa_wiLog(sqliks)
+			// self.debug('THE SQLKIKS OBJECT UPDATE')
+			// self.debug(sqliks)
 			// attribs = [sqliks.attribs.from.table]
 			let sql = "";
 			let attribs = null;
 			let sqliks = self.updateJoinTemplate(options);
-			self.pao.pa_wiLog("THE SQLKIKS OBJECT");
-			self.pao.pa_wiLog(sqliks);
+			self.debug("THE SQLKIKS OBJECT");
+			self.debug(sqliks);
 			contains(sqliks.attribs, "tables") && sqliks.attribs.tables
 				? (attribs = [sqliks.attribs.from.table, ...sqliks.attribs.tables])
 				: (attribs = [sqliks.attribs.from.table]);
 			sql = sqliks.statement;
 			let queryAttributes = attribs;
-			self.pao.pa_wiLog("THE SQL BEFORE FORMAT::MULTIUPDATE");
-			self.pao.pa_wiLog(sql);
+			self.debug("THE SQL BEFORE FORMAT::MULTIUPDATE");
+			self.debug(sql);
 			sql = connector.format(sql, queryAttributes);
-			self.pao.pa_wiLog(sql);
+			self.debug(sql);
 			conn.query(sql, function (e, r) {
 				if (e) return reject(e);
 				resolve(r);
@@ -842,15 +842,15 @@ export const multiTableUpdate = async function (options, conn, connector) {
 };
 export const take = async function (options, conn, conditions, connector) {
 	const self = this;
-	self.pao.pa_wiLog("TAKE:::");
-	self.pao.pa_wiLog(options);
+	self.debug("TAKE:::");
+	self.debug(options);
 	return new Promise((resolve, reject) => {
 		if (options.takeFrom) {
 			let takeFrom = options.takeFrom;
-			self.pao.pa_wiLog("THE TAKEFROM BY TAKEFROM");
-			self.pao.pa_wiLog(takeFrom);
+			self.debug("THE TAKEFROM BY TAKEFROM");
+			self.debug(takeFrom);
 			if (takeFrom.condition) {
-				self.pao.pa_wiLog("THE TAKEFROM CONDITIION IS SET");
+				self.debug("THE TAKEFROM CONDITIION IS SET");
 				options.from.condition = takeFrom.condition;
 				takeFrom.tables.length > 1
 					? (options.length = takeFrom.tables.length)
@@ -869,8 +869,8 @@ export const take = async function (options, conn, conditions, connector) {
 						reject(e);
 					});
 			} else {
-				self.pao.pa_wiLog("THE TAKEFROM HAS NO SET CONDITIONS");
-				self.pao.pa_wiLog(options);
+				self.debug("THE TAKEFROM HAS NO SET CONDITIONS");
+				self.debug(options);
 				delete options.length;
 				options.from.condition = self.searchConditionsFormat([conditions[0]]);
 				// options.tables = options.tables[0]
@@ -884,7 +884,7 @@ export const take = async function (options, conn, conditions, connector) {
 					});
 			}
 		} else {
-			self.pao.pa_wiLog("THE TAKEFROM IS NOT DEFINED");
+			self.debug("THE TAKEFROM IS NOT DEFINED");
 			self
 				.takeSql(options, conn, connector)
 				.then((resultset) => {
@@ -900,35 +900,35 @@ export const takeSql = function (takeOptions, conn, connector) {
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	self.pao.pa_wiLog("THE SEARCH");
-	self.pao.pa_wiLog(search);
+	self.debug("THE SEARCH");
+	self.debug(search);
 	return new Promise(function (resolve, reject) {
 		// do a thing, possibly async, then…
-		self.pao.pa_wiLog("Executing the search promise");
+		self.debug("Executing the search promise");
 		let sql = "";
 		let attribs = null;
 		let sqliks = self.searchStatement(takeOptions);
-		self.pao.pa_wiLog("THE SQLKIKS OBJECT");
-		self.pao.pa_wiLog(sqliks);
+		self.debug("THE SQLKIKS OBJECT");
+		self.debug(sqliks);
 		contains(sqliks.attribs, "tables")
 			? (attribs = [sqliks.attribs.from.table, ...sqliks.attribs.tables])
 			: (attribs = [sqliks.attribs.from.table]);
 		sql = sqliks.statement;
 		let queryAttributes = attribs;
-		self.pao.pa_wiLog("THE SQL BEFORE FORMAT::");
-		self.pao.pa_wiLog(sql);
-		// self.pao.pa_wiLog(conn)
+		self.debug("THE SQL BEFORE FORMAT::");
+		self.debug(sql);
+		// self.debug(conn)
 		sql = connector.format(sql, queryAttributes);
-		self.pao.pa_wiLog(sql);
+		self.debug(sql);
 		conn.query(sql, function (e, r) {
 			if (e) {
-				self.pao.pa_wiLog("Promise is rejecting search");
-				self.pao.pa_wiLog(e);
+				self.debug("Promise is rejecting search");
+				self.debug(e);
 				reject(e);
 			} else {
-				self.pao.pa_wiLog("Promise is Resolving search");
-				self.pao.pa_wiLog(r);
-				self.pao.pa_wiLog(r[0]);
+				self.debug("Promise is Resolving search");
+				self.debug(r);
+				self.debug(r[0]);
 				resolve(r);
 			}
 		});
@@ -949,17 +949,17 @@ export const removeJoin = function (removiks) {
 			let sql = "";
 			let attribs = null;
 			let sqliks = self.queryTemplate(self.searchOptions(removiks), "delete");
-			self.pao.pa_wiLog("THE SQLKIKS OBJECT DELETEDANDTAKE[REMOVE]");
-			self.pao.pa_wiLog(sqliks);
+			self.debug("THE SQLKIKS OBJECT DELETEDANDTAKE[REMOVE]");
+			self.debug(sqliks);
 			contains(sqliks.attribs, "tables")
 				? (attribs = [...sqliks.attribs.tables, sqliks.attribs.from.table])
 				: (attribs = [sqliks.attribs.from.table]);
 			sql = sqliks.statement;
 			let queryAttributes = attribs;
-			self.pao.pa_wiLog("THE SQL BEFORE FORMAT");
-			self.pao.pa_wiLog(sql);
+			self.debug("THE SQL BEFORE FORMAT");
+			self.debug(sql);
 			sql = connector.format(sql, queryAttributes);
-			self.pao.pa_wiLog(sql);
+			self.debug(sql);
 			conn.query(sql, function (e, r) {
 				if (e) return handler(e, null);
 				handler(null, r);
@@ -983,15 +983,15 @@ export const remove = function (removiks) {
 			let sql = "";
 			let attribs = null;
 			let sqliks = self.queryTemplate(self.queryOptions(remove), "delete");
-			self.pao.pa_wiLog("THE SQLKIKS OBJECT DELETED[REMOVE]");
-			self.pao.pa_wiLog(sqliks);
+			self.debug("THE SQLKIKS OBJECT DELETED[REMOVE]");
+			self.debug(sqliks);
 			attribs = [sqliks.attribs.from.table];
 			sql = sqliks.statement;
 			let queryAttributes = attribs;
-			self.pao.pa_wiLog("THE SQL BEFORE FORMAT");
-			self.pao.pa_wiLog(sql);
+			self.debug("THE SQL BEFORE FORMAT");
+			self.debug(sql);
 			sql = connector.format(sql, queryAttributes);
-			self.pao.pa_wiLog(sql);
+			self.debug(sql);
 			conn.query(sql, function (e, r) {
 				if (e) handler(e, null);
 				return removiks.delete
@@ -1006,8 +1006,8 @@ export const remove = function (removiks) {
 };
 export const queryOptions = function (i) {
 	const self = this;
-	self.pao.pa_wiLog("THE search BATCH ITEM");
-	self.pao.pa_wiLog(i);
+	self.debug("THE search BATCH ITEM");
+	self.debug(i);
 	let pao = self.pao;
 	let contains = pao.pa_contains;
 	// let rest = {
@@ -1024,8 +1024,8 @@ export const queryOptions = function (i) {
 				condition: self.searchConditionsFormat(i.conditions),
 		  })
 		: (options.from = { table: i.table });
-	self.pao.pa_wiLog("THE CODE GETS HERE");
-	self.pao.pa_wiLog(options);
+	self.debug("THE CODE GETS HERE");
+	self.debug(options);
 	contains(i, ["returnFields", "opiks"])
 		? (options.fields = self.searchFieldsFormat(i.opiks, i.returnFields))
 		: contains(i, "opiks")
@@ -1047,16 +1047,16 @@ export const queryOptions = function (i) {
 			  )))
 			: (options.takeFrom = i.takeFrom)
 		: "";
-	self.pao.pa_wiLog("THE OPTIONS");
-	self.pao.pa_wiLog(options);
+	self.debug("THE OPTIONS");
+	self.debug(options);
 	return options;
 };
 export const queryTemplate = function (options, type) {
 	const self = this;
 	const pao = self.pao;
 	const contains = pao.pa_contains;
-	self.pao.pa_wiLog("THE QUERY TEMPLATE");
-	self.pao.pa_wiLog(options);
+	self.debug("THE QUERY TEMPLATE");
+	self.debug(options);
 	if (type === "select") {
 		let sqlAttribs = {};
 		sqlAttribs.attribs = { from: options.from };
@@ -1096,10 +1096,10 @@ export const queryTemplate = function (options, type) {
 			let sqlAttribs = {};
 			sqlAttribs.attribs = { from: options.from, tables: options.tables };
 			options.tables.unshift(options.from.table);
-			self.pao.pa_wiLog("DELETE OPTIONS OBJECT");
-			self.pao.pa_wiLog(options);
-			self.pao.pa_wiLog(options.tables);
-			self.pao.pa_wiLog(options.length);
+			self.debug("DELETE OPTIONS OBJECT");
+			self.debug(options);
+			self.debug(options.tables);
+			self.debug(options.length);
 			switch (options.length) {
 				case 3:
 					sqlAttribs.statement = `DELETE ??,??,??
@@ -1134,8 +1134,8 @@ export const queryTemplate = function (options, type) {
                                   
                                   `;
 			}
-			self.pao.pa_wiLog("SQL ATTRRIBS");
-			self.pao.pa_wiLog(sqlAttribs);
+			self.debug("SQL ATTRRIBS");
+			self.debug(sqlAttribs);
 			return sqlAttribs;
 		} else {
 			let sqlAttribs = {};
@@ -1165,37 +1165,37 @@ export const transaction = function (data) {
 };
 export const procedure = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE procedure got a call");
+	self.debug("THE procedure got a call");
 	if (typeof data.query === "function") {
 		data.query();
 	} else {
-		self.pao.pa_wiLog("INSIDE PROCEDURE");
-		//  self.pao.pa_wiLog(data.outComehandler)
-		//  self.pao.pa_wiLog(data)
+		self.debug("INSIDE PROCEDURE");
+		//  self.debug(data.outComehandler)
+		//  self.debug(data)
 		self.PROCEDURE(data.query, data.conn, data.outComehandler, data.connector);
 	}
 };
 export const join = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE procedure got a call");
+	self.debug("THE procedure got a call");
 	if (typeof data.query === "function") {
 		data.query();
 	} else {
-		self.pao.pa_wiLog("INSIDE JOIN");
-		//  self.pao.pa_wiLog(data.outComehandler)
-		//  self.pao.pa_wiLog(data)
+		self.debug("INSIDE JOIN");
+		//  self.debug(data.outComehandler)
+		//  self.debug(data)
 		self.JOIN(data.query, data.conn, data.outComehandler);
 	}
 };
 export const search = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE search got a call");
+	self.debug("THE search got a call");
 	if (typeof data.query === "function") {
 		data.query();
 	} else {
-		self.pao.pa_wiLog("INSIDE SEARCH");
-		//  self.pao.pa_wiLog(data.outComehandler)
-		//  self.pao.pa_wiLog(data)
+		self.debug("INSIDE SEARCH");
+		//  self.debug(data.outComehandler)
+		//  self.debug(data)
 		self.SEARCH(data.query, data.conn, data.outComehandler, data.connector);
 	}
 };
@@ -1237,7 +1237,7 @@ export const TRANSACTION = function (
 			});
 		if (breakOut) break;
 		if (c === collections.length - 1) {
-			self.pao.pa_wiLog("Operation completed successfully");
+			self.debug("Operation completed successfully");
 			handler("Transaction Operation sucessful");
 		}
 	}
@@ -1250,10 +1250,10 @@ export const PROCEDURE = async function (
 ) {
 	const self = this;
 	const pao = self.pao;
-	self.pao.pa_wiLog("THE PROCEDURE METHOD");
-	self.pao.pa_wiLog(collections);
-	self.pao.pa_wiLog(handler);
-	//self.pao.pa_wiLog(conn)
+	self.debug("THE PROCEDURE METHOD");
+	self.debug(collections);
+	self.debug(handler);
+	//self.debug(conn)
 	let collectionsIds = [];
 	let breakOut = false;
 	conn.getConnection(async (err, connection) => {
@@ -1276,7 +1276,7 @@ export const PROCEDURE = async function (
 				break;
 			} else {
 				if (pao.pa_contains(i.fields, "tables")) {
-					self.pao.pa_wiLog("sources will be assigned A VALUE");
+					self.debug("sources will be assigned A VALUE");
 					sources = i.fields.tables;
 					own = i.fields.own;
 				} else if (pao.pa_contains(i.fields, "own")) {
@@ -1365,12 +1365,12 @@ export const PROCEDURE = async function (
 			// })
 			if (breakOut) break;
 			if (c === collections.length - 1) {
-				self.pao.pa_wiLog("Operation completed successfully");
-				self.pao.pa_wiLog(collectionsIds);
+				self.debug("Operation completed successfully");
+				self.debug(collectionsIds);
 				connection.release();
 				if (collectionsIds.length > 0) {
-					self.pao.pa_wiLog("PROCEDURE IS COMPLETED");
-					self.pao.pa_wiLog(collectionsIds);
+					self.debug("PROCEDURE IS COMPLETED");
+					self.debug(collectionsIds);
 					let savedData = null;
 					self.infoSync("THE COLLECTIONS");
 					self.infoSync(collectionsIds);
@@ -1412,7 +1412,7 @@ export const insert = function (inset, conn, connector) {
 	let pao = pao;
 	return new Promise(function (resolve, reject) {
 		// do a thing, possibly async, then…
-		self.pao.pa_wiLog("Executing the insert promise");
+		self.debug("Executing the insert promise");
 		self.infoSync("THE INSET");
 		self.infoSync(inset);
 		let sql = "";
@@ -1461,7 +1461,7 @@ export const insert = function (inset, conn, connector) {
 		self.infoSync(sql);
 		conn.query(sql, function (e, r) {
 			if (e) {
-				self.pao.pa_wiLog("Promise is rejecting");
+				self.debug("Promise is rejecting");
 				reject(e);
 			} else {
 				//{table: 'jo_job_alert',opiks: ['fuxin.count.options[*].as[alertsCount]'],conditions:[`u_id EQUALS ${uid}`]}
@@ -1477,16 +1477,16 @@ export const insert = function (inset, conn, connector) {
 					outComehandler: (e = null, r = null, data = null) => {
 						let insert = {};
 						if (e) {
-							self.pao.pa_wiLog("the errorINSERT");
-							self.pao.pa_wiLog(e);
-							self.pao.pa_wiLog(data);
+							self.debug("the errorINSERT");
+							self.debug(e);
+							self.debug(data);
 							insert.error = e;
 							insert.lastInsert = data.query.user.id;
 							insert.fields = null;
 							insert.collection = data.table;
 							insert.collectionAlt = inset.altName ? inset.altName : "";
-							self.pao.pa_wiLog("Promise is Resolving with findOne error");
-							self.pao.pa_wiLog(insert);
+							self.debug("Promise is Resolving with findOne error");
+							self.debug(insert);
 							resolve(insert);
 						} else {
 							self.infoSync("THE RESULT FROM FIND");
@@ -1499,8 +1499,8 @@ export const insert = function (inset, conn, connector) {
 							insert.collection = inset.name;
 							insert.collectionAlt = inset.altName ? inset.altName : "";
 							// throw new Error()
-							self.pao.pa_wiLog("Promise is Resolving with Find SUCCESS");
-							self.pao.pa_wiLog(insert);
+							self.debug("Promise is Resolving with Find SUCCESS");
+							self.debug(insert);
 							resolve(insert);
 						}
 					},
@@ -1534,17 +1534,17 @@ export const procedureUpdate = function (update, conn, connector) {
 				self.infoSync(data);
 				let update = {};
 				if (e) {
-					self.pao.pa_wiLog("the errorUDPATE");
-					self.pao.pa_wiLog(e);
-					self.pao.pa_wiLog(data);
+					self.debug("the errorUDPATE");
+					self.debug(e);
+					self.debug(data);
 					self.infoSync("THE ERROR");
 					self.infoSync(e);
 					update.error = e;
 					update.fields = null;
 					update.collection = data.name;
 					update.collectionAlt = data.altName ? data.altName : "";
-					self.pao.pa_wiLog("Promise is Resolving with findOne error");
-					self.pao.pa_wiLog(insert);
+					self.debug("Promise is Resolving with findOne error");
+					self.debug(insert);
 					resolve(update);
 				} else {
 					self.infoSync("THE SUCCESS");
@@ -1578,8 +1578,8 @@ export const procedureUpdate = function (update, conn, connector) {
 						update.isUpdate = true;
 						update.isUpdated = false;
 					}
-					self.pao.pa_wiLog("Promise is Resolving with FindOne SUCCESS");
-					self.pao.pa_wiLog(update);
+					self.debug("Promise is Resolving with FindOne SUCCESS");
+					self.debug(update);
 					resolve(update);
 				}
 			},
@@ -1601,17 +1601,17 @@ export const procedureDelete = function (toDelete, conn, connector) {
 			outComehandler: (e = null, r = null, data = null) => {
 				let update = {};
 				if (e) {
-					self.pao.pa_wiLog("the errorDelete");
-					self.pao.pa_wiLog(e);
-					self.pao.pa_wiLog(data);
+					self.debug("the errorDelete");
+					self.debug(e);
+					self.debug(data);
 					self.infoSync("THE ERROR");
 					self.infoSync(e);
 					update.error = e;
 					update.fields = null;
 					update.collection = data.name;
 					update.collectionAlt = data.altName ? data.altName : "";
-					self.pao.pa_wiLog("Promise is Resolving with findOne error");
-					self.pao.pa_wiLog(insert);
+					self.debug("Promise is Resolving with findOne error");
+					self.debug(insert);
 					resolve(update);
 				} else {
 					self.infoSync("THE DELETE SUCCESS");
@@ -1632,8 +1632,8 @@ export const procedureDelete = function (toDelete, conn, connector) {
 						update.isDelete = true;
 						update.isDeleted = false;
 					}
-					self.pao.pa_wiLog("Promise is Resolving with FindOne SUCCESS");
-					self.pao.pa_wiLog(update);
+					self.debug("Promise is Resolving with FindOne SUCCESS");
+					self.debug(update);
 					resolve(update);
 				}
 			},
@@ -1657,15 +1657,15 @@ export const procedureSelect = function (select, conn, connector) {
 			outComehandler: (e = null, r = null, data = null) => {
 				let select = {};
 				if (e) {
-					self.pao.pa_wiLog("the errorINSERT");
-					self.pao.pa_wiLog(e);
-					self.pao.pa_wiLog(data);
+					self.debug("the errorINSERT");
+					self.debug(e);
+					self.debug(data);
 					select.error = e;
 					select.lastInsert = data.query.user.id;
 					select.fields = null;
 					select.collection = data.table;
-					self.pao.pa_wiLog("Promise is Resolving with findOne error");
-					self.pao.pa_wiLog(insert);
+					self.debug("Promise is Resolving with findOne error");
+					self.debug(insert);
 					resolve(insert);
 				} else {
 					self.infoSync("THE RESULT FROM FIND");
@@ -1677,8 +1677,8 @@ export const procedureSelect = function (select, conn, connector) {
 					select.fields = { ...foundUser };
 					select.collection = select.name;
 					// throw new Error()
-					self.pao.pa_wiLog("Promise is Resolving with Find SUCCESS");
-					self.pao.pa_wiLog(select);
+					self.debug("Promise is Resolving with Find SUCCESS");
+					self.debug(select);
 					resolve(select);
 				}
 			},
@@ -1690,34 +1690,32 @@ export const JOIN = async function (join, conn, handler = null) {
 	self
 		.joinExek(join, conn)
 		.then((result) => {
-			self.pao.pa_wiLog("jOIN is successful, sending results to the requester");
-			self.pao.pa_wiLog(result);
+			self.debug("jOIN is successful, sending results to the requester");
+			self.debug(result);
 			handler(null, result);
 		})
 		.catch((failedRequest) => {
-			self.pao.pa_wiLog("JOIN FAILED");
-			self.pao.pa_wiLog(failedRequest);
+			self.debug("JOIN FAILED");
+			self.debug(failedRequest);
 			handler(failedRequest, null);
 		});
 };
 export const SEARCH = async function (search, conn, handler = null, connector) {
 	const self = this;
 	const pao = self.pao;
-	self.pao.pa_wiLog("THE SEARCH search object contents");
-	self.pao.pa_wiLog(search);
+	self.debug("THE SEARCH search object contents");
+	self.debug(search);
 	if (!pao.pa_contains(search, "batch")) {
 		self
 			.searchExek(search, conn, connector)
 			.then((result) => {
-				self.pao.pa_wiLog(
-					"search is successful, sending results to the requester",
-				);
-				// self.pao.pa_wiLog(result)
+				self.debug("search is successful, sending results to the requester");
+				// self.debug(result)
 				handler(null, result);
 			})
 			.catch((failedRequest) => {
-				self.pao.pa_wiLog("search FAILED");
-				self.pao.pa_wiLog(failedRequest);
+				self.debug("search FAILED");
+				self.debug(failedRequest);
 				handler(failedRequest, null);
 			});
 	} else {
@@ -1727,21 +1725,19 @@ export const SEARCH = async function (search, conn, handler = null, connector) {
 			await self
 				.searchExek(batch[s], conn, connector)
 				.then((result) => {
-					self.pao.pa_wiLog(
-						"search is successful, pushing results to the resultSet",
-					);
-					// self.pao.pa_wiLog(result)
+					self.debug("search is successful, pushing results to the resultSet");
+					// self.debug(result)
 					resultSet.push(result);
 					if (s === batch.length - 1) {
-						self.pao.pa_wiLog("Operation completed successfully");
-						// self.pao.pa_wiLog(resultSet)
+						self.debug("Operation completed successfully");
+						// self.debug(resultSet)
 						handler(null, resultSet);
 					}
 					// handler(null,result)
 				})
 				.catch((failedRequest) => {
-					self.pao.pa_wiLog("search FAILED");
-					self.pao.pa_wiLog(failedRequest);
+					self.debug("search FAILED");
+					self.debug(failedRequest);
 					resultSet.push({
 						item: s,
 						errorMessage: `Item of ${s} position has failed`,
@@ -1755,7 +1751,7 @@ export const SEARCH = async function (search, conn, handler = null, connector) {
 export const combineFields = function (tables, own, ids) {
 	const self = this;
 	let fields = {};
-	self.pao.pa_wiLog("COMBINE FIELDS GETS A CALL");
+	self.debug("COMBINE FIELDS GETS A CALL");
 	self.infoSync("THE TABLES");
 	self.infoSync(tables);
 	self.infoSync(ids);
@@ -1763,11 +1759,11 @@ export const combineFields = function (tables, own, ids) {
 		for (let co = 0; co < ids.length; co++) {
 			if (ids[co].collection === v.name) {
 				v.values.forEach((vv) => {
-					self.pao.pa_wiLog("THE VV");
-					self.pao.pa_wiLog(vv);
+					self.debug("THE VV");
+					self.debug(vv);
 					let fieldValuePair = vv.split(".");
-					self.pao.pa_wiLog("FIELD VALUE PAIR");
-					self.pao.pa_wiLog(fieldValuePair);
+					self.debug("FIELD VALUE PAIR");
+					self.debug(fieldValuePair);
 					fields[fieldValuePair[1]] = ids[co].fields[fieldValuePair[0]];
 				});
 				break;
@@ -1775,8 +1771,8 @@ export const combineFields = function (tables, own, ids) {
 		}
 	});
 	let keys = Object.keys(own);
-	self.pao.pa_wiLog("THE KEYS OF OWN");
-	self.pao.pa_wiLog(keys);
+	self.debug("THE KEYS OF OWN");
+	self.debug(keys);
 	self.infoSync("THE KEYS OF OWN");
 	self.infoSync(keys);
 	if (own instanceof Array) {
@@ -1791,15 +1787,15 @@ export const combineFields = function (tables, own, ids) {
 		return dictFields;
 	} else {
 		let keys = Object.keys(own);
-		self.pao.pa_wiLog("THE KEYS OF OWN");
-		self.pao.pa_wiLog(keys);
+		self.debug("THE KEYS OF OWN");
+		self.debug(keys);
 		self.infoSync("THE KEYS OF OWN");
 		self.infoSync(keys);
 		keys.forEach((k) => {
 			fields[k] = own[k];
 		});
-		self.pao.pa_wiLog("THE FIELDS");
-		self.pao.pa_wiLog(fields);
+		self.debug("THE FIELDS");
+		self.debug(fields);
 		self.infoSync("THE FIELDS");
 		self.infoSync(fields);
 		return fields;
@@ -1816,7 +1812,7 @@ export const joinExek = function (join, conn, connector) {
 	let self = this;
 	return new Promise(function (resolve, reject) {
 		// do a thing, possibly async, then…
-		self.pao.pa_wiLog("Executing the JOIN promise");
+		self.debug("Executing the JOIN promise");
 		let options = {
 			fields: join.returnFields,
 			from: {
@@ -1830,19 +1826,19 @@ export const joinExek = function (join, conn, connector) {
 		};
 		let sql = self.joinStatement(options);
 		let queryAttributes = [options.from.table, options.tables[0]];
-		self.pao.pa_wiLog("THE SQL BEFORE FORMAT");
-		self.pao.pa_wiLog(sql);
+		self.debug("THE SQL BEFORE FORMAT");
+		self.debug(sql);
 		sql = connector.format(sql, queryAttributes);
-		self.pao.pa_wiLog(sql);
+		self.debug(sql);
 		conn.query(sql, function (e, r) {
 			if (e) {
-				self.pao.pa_wiLog("Promise is rejecting JOIN");
-				self.pao.pa_wiLog(e);
+				self.debug("Promise is rejecting JOIN");
+				self.debug(e);
 				reject(e);
 			} else {
-				self.pao.pa_wiLog("Promise is Resolving JOIN");
-				self.pao.pa_wiLog(r);
-				self.pao.pa_wiLog(r[0]);
+				self.debug("Promise is Resolving JOIN");
+				self.debug(r);
+				self.debug(r[0]);
 				resolve(r[0]);
 			}
 		});
@@ -1850,8 +1846,8 @@ export const joinExek = function (join, conn, connector) {
 };
 export const joinConditionsFormat = function (conditions, type = null) {
 	const self = this;
-	self.pao.pa_wiLog("CONDITIONS");
-	self.pao.pa_wiLog(conditions);
+	self.debug("CONDITIONS");
+	self.debug(conditions);
 	if (type) {
 		let cons = conditions;
 		let condition = [];
@@ -1860,18 +1856,18 @@ export const joinConditionsFormat = function (conditions, type = null) {
 			let operand = "=";
 			condition.push(`${conList[0]} ${operand} ${conList[2]}`);
 		});
-		self.pao.pa_wiLog("THE JOIN ON CONDITION");
-		self.pao.pa_wiLog(condition);
+		self.debug("THE JOIN ON CONDITION");
+		self.debug(condition);
 		return condition;
 	} else {
 		let cons = conditions;
 		let condition = "";
 		cons.forEach((con) => {
-			self.pao.pa_wiLog("THE con ITEM");
-			self.pao.pa_wiLog(con);
+			self.debug("THE con ITEM");
+			self.debug(con);
 			let conList = con.trim().split(" ");
-			self.pao.pa_wiLog("THE CONLIST");
-			self.pao.pa_wiLog(conList);
+			self.debug("THE CONLIST");
+			self.debug(conList);
 			let operand = "";
 			switch (conList[1]) {
 				case "EQUALS":
@@ -1888,15 +1884,15 @@ export const joinConditionsFormat = function (conditions, type = null) {
 			}
 			condition += `${conList[0]} ${operand} '${conList[2]}'`;
 		});
-		self.pao.pa_wiLog("THE JOIN FROM CONDITION");
-		self.pao.pa_wiLog(condition);
+		self.debug("THE JOIN FROM CONDITION");
+		self.debug(condition);
 		return condition.trim();
 	}
 };
 export const joinStatement = function (options) {
 	const self = this;
-	self.pao.pa_wiLog("THE JOIN OPTIONS");
-	self.pao.pa_wiLog(options);
+	self.debug("THE JOIN OPTIONS");
+	self.debug(options);
 	switch (options.length) {
 		case 3:
 			return `SELECT ${options.fields}
@@ -2000,36 +1996,36 @@ export const joinStatement = function (options) {
 export const searchExek = function (search, conn, connector) {
 	const self = this;
 	const contains = self.pao.pa_contains;
-	self.pao.pa_wiLog("THE SEARCH");
-	self.pao.pa_wiLog(search);
+	self.debug("THE SEARCH");
+	self.debug(search);
 	return new Promise(function (resolve, reject) {
 		// do a thing, possibly async, then…
-		self.pao.pa_wiLog("Executing the search promise");
+		self.debug("Executing the search promise");
 		let sql = "";
 		let attribs = null;
 		let sqliks = self.searchStatement(self.searchOptions(search));
-		self.pao.pa_wiLog("THE SQLKIKS OBJECT");
-		self.pao.pa_wiLog(sqliks);
+		self.debug("THE SQLKIKS OBJECT");
+		self.debug(sqliks);
 		contains(sqliks.attribs, "tables")
 			? (attribs = [sqliks.attribs.from.table, ...sqliks.attribs.tables])
 			: (attribs = [sqliks.attribs.from.table]);
 		sql = sqliks.statement;
 		let queryAttributes = attribs;
-		self.pao.pa_wiLog("THE SQL BEFORE FORMAT");
-		self.pao.pa_wiLog(sql);
+		self.debug("THE SQL BEFORE FORMAT");
+		self.debug(sql);
 		sql = connector.format(sql, queryAttributes);
-		self.pao.pa_wiLog(sql);
+		self.debug(sql);
 		// self.infoSync('THE SEARCH SQL')
 		// self.infoSync(sql)
 		conn.query(sql, function (e, r) {
 			if (e) {
-				self.pao.pa_wiLog("Promise is rejecting search");
-				self.pao.pa_wiLog(e);
+				self.debug("Promise is rejecting search");
+				self.debug(e);
 				reject(e);
 			} else {
-				self.pao.pa_wiLog("Promise is Resolving search");
-				//  self.pao.pa_wiLog(r)
-				//  self.pao.pa_wiLog(r[0])
+				self.debug("Promise is Resolving search");
+				//  self.debug(r)
+				//  self.debug(r[0])
 				self.infoSync("THE SEARCH RESULTS");
 				self.infoSync(r);
 				resolve(r);
@@ -2039,29 +2035,29 @@ export const searchExek = function (search, conn, connector) {
 };
 export const searchConditionsFormat = function (conditions, type = null) {
 	const self = this;
-	self.pao.pa_wiLog("CONDITIONS");
-	self.pao.pa_wiLog(conditions);
+	self.debug("CONDITIONS");
+	self.debug(conditions);
 	if (type) {
 		let condition = self.parseFormatCondition(conditions, type);
-		self.pao.pa_wiLog("THE search ON CONDITION");
-		self.pao.pa_wiLog(condition);
+		self.debug("THE search ON CONDITION");
+		self.debug(condition);
 		return condition;
 	} else {
 		let cons = conditions;
 		let condition = "";
 		cons.forEach((con) => {
 			if (con.indexOf("GROUP::") >= 0) {
-				self.pao.pa_wiLog("CONDITION FROM SEARCHCONDITIONFORMAT");
-				self.pao.pa_wiLog(con);
+				self.debug("CONDITION FROM SEARCHCONDITIONFORMAT");
+				self.debug(con);
 				condition += self.parseGroup(con);
 			} else {
 				condition += self.parseFormatCondition(con);
 			}
-			/*self.pao.pa_wiLog('THE con ITEM')
-            self.pao.pa_wiLog(con)
+			/*self.debug('THE con ITEM')
+            self.debug(con)
             let conList = con.trim().split(' ')
-            self.pao.pa_wiLog('THE CONLIST')
-            self.pao.pa_wiLog(conList)
+            self.debug('THE CONLIST')
+            self.debug(conList)
             let operand = ''
             let leftoperand = ''
             let multiCon = false
@@ -2075,8 +2071,8 @@ export const searchConditionsFormat = function (conditions, type = null) {
         
                 let oCon = conList.slice(0)
         
-                self.pao.pa_wiLog('THE O CON')
-                self.pao.pa_wiLog(oCon)
+                self.debug('THE O CON')
+                self.debug(oCon)
                  multiCon = oCon[0].trim().toUpperCase() !== 'MATCH' ? true : false
         
                 let matchFields = ''
@@ -2096,8 +2092,8 @@ export const searchConditionsFormat = function (conditions, type = null) {
         
                 matchFields[0] === '[' ? matchFields = matchFields.slice(1,matchFields.length -1) : ''
                 matchKeys[0] === '[' ? matchKeys = matchKeys.slice(1,matchKeys.length - 1) : ''
-                self.pao.pa_wiLog('THE MATCH FIELDS')
-                self.pao.pa_wiLog(matchFields)
+                self.debug('THE MATCH FIELDS')
+                self.debug(matchFields)
                 let op = ''
                 operand = multiCon ? oCon[3].trim() : oCon[2].trim()
                 let mode = multiCon ? oCon[5] : oCon[4]
@@ -2136,8 +2132,8 @@ export const searchConditionsFormat = function (conditions, type = null) {
               
                 let oCon = conList.slice(0)
         
-                self.pao.pa_wiLog('THE O CON')
-                self.pao.pa_wiLog(oCon)
+                self.debug('THE O CON')
+                self.debug(oCon)
                 multiCon = oCon[0].trim().toUpperCase() === ('AND' || 'OR' || 'NOT') ? true : false
                 let operator = multiCon ? conList[2] : conList[1]
         
@@ -2181,22 +2177,22 @@ export const searchConditionsFormat = function (conditions, type = null) {
             match ? condition += `${conList[0]}` : multiCon ? condition += ` ${conList[0]} ${conList[1]} ${operand} '${leftoperand}' `
             : condition += `${conList[0]} ${operand} '${leftoperand}' `*/
 		});
-		self.pao.pa_wiLog("THE search FROM CONDITION");
-		self.pao.pa_wiLog(condition);
+		self.debug("THE search FROM CONDITION");
+		self.debug(condition);
 		return condition.trim();
 	}
 };
 export const searchStatement = function (options) {
 	const self = this;
-	self.pao.pa_wiLog("THE search OPTIONSSTATEMENT");
-	self.pao.pa_wiLog(options);
+	self.debug("THE search OPTIONSSTATEMENT");
+	self.debug(options);
 	const contains = self.pao.pa_contains;
 	if (!options) return null;
 	if (contains(options, "length")) {
 		let sqlAttribs = {};
 		sqlAttribs.attribs = { from: options.from, tables: options.tables };
-		self.pao.pa_wiLog("THE OPTIONS LENGTH");
-		self.pao.pa_wiLog(options.length);
+		self.debug("THE OPTIONS LENGTH");
+		self.debug(options.length);
 		let limit = " ";
 		let sort = options.sort ? self.sort(options.sort) : " ";
 		options.take
@@ -2292,11 +2288,11 @@ export const searchOptions = function (i, multiSet = false) {
 	let contains = pao.pa_contains;
 	let setTables = "";
 	setTables = multiSet ? [...i.tables] : "";
-	self.pao.pa_wiLog("THE search BATCH ITEM");
-	self.pao.pa_wiLog(i);
-	self.pao.pa_wiLog(i);
+	self.debug("THE search BATCH ITEM");
+	self.debug(i);
+	self.debug(i);
 	if (contains(i, ["joins", "conditions", "joinPoints"])) {
-		self.pao.pa_wiLog(
+		self.debug(
 			"THE SEARCH ITEM CONTAINS BOTH JOINS,CONDITIONS, AND JOINPOINTS",
 		);
 		let options = {};
@@ -2410,9 +2406,9 @@ export const searchOptions = function (i, multiSet = false) {
 };
 export const searchFieldsFormat = function (fields, rFields = null) {
 	const self = this;
-	self.pao.pa_wiLog("THE SELECT STATEMENT OPIKS OBJECT");
-	self.pao.pa_wiLog(fields);
-	self.pao.pa_wiLog(rFields);
+	self.debug("THE SELECT STATEMENT OPIKS OBJECT");
+	self.debug(fields);
+	self.debug(rFields);
 	let fis = fields;
 	let keyword = "";
 	let otherFields = rFields ? rFields.join(",") : "";
@@ -2421,9 +2417,9 @@ export const searchFieldsFormat = function (fields, rFields = null) {
 	let multiFields = [];
 	let allFields = otherFields.indexOf("all") >= 0;
 	let lastCondition = false;
-	self.pao.pa_wiLog("THE OTHER FIELDS");
-	self.pao.pa_wiLog(otherFields);
-	self.pao.pa_wiLog(otherFields.indexOf("all") >= 0);
+	self.debug("THE OTHER FIELDS");
+	self.debug(otherFields);
+	self.debug(otherFields.indexOf("all") >= 0);
 	for (let fi = 0; fi < fis.length; fi++) {
 		if (fis[fi].indexOf("fuxin") >= 0 || fis[fi].indexOf("field") >= 0) {
 			multiFields.push(true);
@@ -2437,10 +2433,10 @@ export const searchFieldsFormat = function (fields, rFields = null) {
 		if (formated instanceof Object) {
 			keyword = formated.value.toUpperCase();
 		} else {
-			self.pao.pa_wiLog("THE FORMATED");
-			self.pao.pa_wiLog(formated);
-			self.pao.pa_wiLog(allFields);
-			self.pao.pa_wiLog(otherFields);
+			self.debug("THE FORMATED");
+			self.debug(formated);
+			self.debug(allFields);
+			self.debug(otherFields);
 			if (i === fis.length - 1) {
 				lastCondition = true;
 			}
@@ -2460,8 +2456,8 @@ export const searchFieldsFormat = function (fields, rFields = null) {
 };
 export const fieldFormat = function (field, from = null) {
 	const self = this;
-	self.pao.pa_wiLog("THE SELECT STATEMENT OPIKS OBJECT FIELD FORMAT");
-	self.pao.pa_wiLog(field);
+	self.debug("THE SELECT STATEMENT OPIKS OBJECT FIELD FORMAT");
+	self.debug(field);
 	//  let splitFieldRegx = /\.(?![^\[]]*\]])/
 	let nestedIntFuxin = "";
 	let last =
@@ -2469,26 +2465,26 @@ export const fieldFormat = function (field, from = null) {
 	field.indexOf(".options[fuxin") >= 0
 		? (nestedIntFuxin = field.slice(field.indexOf(".options[fuxin"), last))
 		: "";
-	self.pao.pa_wiLog("THE NESTEDINTFUXIN");
-	self.pao.pa_wiLog(nestedIntFuxin);
-	self.pao.pa_wiLog(field);
+	self.debug("THE NESTEDINTFUXIN");
+	self.debug(nestedIntFuxin);
+	self.debug(field);
 	nestedIntFuxin.trim() !== ""
 		? (field = field.substr(0, field.indexOf(nestedIntFuxin)))
 		: "";
 	// nestedIntFuxin.trim() !== '' ? field =  : ''
 	// let splicedArray = conList.splice(2)
-	// self.pao.pa_wiLog('THE SPLICED ARRAY')
-	// self.pao.pa_wiLog(splicedArray)
-	// self.pao.pa_wiLog(splicedArray.join(' '))
+	// self.debug('THE SPLICED ARRAY')
+	// self.debug(splicedArray)
+	// self.debug(splicedArray.join(' '))
 	// conList[2] = splicedArray.join(' ');
-	// self.pao.pa_wiLog(conList)
-	// self.pao.pa_wiLog(conList[2].indexOf('['))
+	// self.debug(conList)
+	// self.debug(conList[2].indexOf('['))
 	//  let fieldList = field.trim().split('.')
 	//  fieldList.length > 3 ? fieldList[3].indexOf('as[') < 0 ? fieldList[2] = fieldList.splice(2).join(' ') : '' : ''
 	let fieldList = field.trim().split(".");
 	nestedIntFuxin.trim() !== "" ? fieldList.push(nestedIntFuxin) : "";
-	self.pao.pa_wiLog("THE FIELD LIST");
-	self.pao.pa_wiLog(fieldList);
+	self.debug("THE FIELD LIST");
+	self.debug(fieldList);
 	let fieldstatement = null;
 	//fuxin.date_sub.options[fuxin.now,INTERVAL ${intExp} ${intUnit}]
 	let as =
@@ -2497,8 +2493,8 @@ export const fieldFormat = function (field, from = null) {
 				? `AS ${self.options(`${fieldList[3]}`, "as")}`
 				: " "
 			: " ";
-	self.pao.pa_wiLog("THE as");
-	self.pao.pa_wiLog(as);
+	self.debug("THE as");
+	self.debug(as);
 	switch (fieldList[0]) {
 		case "keyword":
 			fieldstatement = from
@@ -2525,15 +2521,15 @@ export const fieldFormat = function (field, from = null) {
 };
 export const options = function (option, type = "") {
 	const self = this;
-	self.pao.pa_wiLog("THE CURRENT OPTION");
-	self.pao.pa_wiLog(option);
+	self.debug("THE CURRENT OPTION");
+	self.debug(option);
 	if (option !== "undefined") {
 		let stripedOption = option.slice(
 			option.indexOf("[") + 1,
 			option.lastIndexOf("]"),
 		);
-		self.pao.pa_wiLog("OPTIONS: STRIPEDOPTION");
-		self.pao.pa_wiLog(stripedOption);
+		self.debug("OPTIONS: STRIPEDOPTION");
+		self.debug(stripedOption);
 		if (type === "as") {
 			return `${stripedOption}`;
 		} else if (type === "option") {
@@ -2555,15 +2551,15 @@ export const options = function (option, type = "") {
 			}
 		}
 	} else {
-		self.pao.pa_wiLog("THE OPTION IS UNDEFINED");
-		self.pao.pa_wiLog(option);
+		self.debug("THE OPTION IS UNDEFINED");
+		self.debug(option);
 		return "";
 	}
 };
 export const sort = function (sort) {
 	const self = this;
-	self.pao.pa_wiLog("THE SORT GOT A RESPONSE");
-	self.pao.pa_wiLog(sort);
+	self.debug("THE SORT GOT A RESPONSE");
+	self.debug(sort);
 	let sortArgs = sort.split(".");
 	let sortFields = sort.slice(sort.indexOf("[") + 1, sort.lastIndexOf("]"));
 	let sortStatement = "";
@@ -2610,46 +2606,46 @@ export const parseGroup = function (con, level = 1) {
 	let fullCon = "";
 	let connector = "";
 	let res = self.conditionsConnector(con);
-	self.pao.pa_wiLog("THE RES VALUE");
-	self.pao.pa_wiLog(res);
+	self.debug("THE RES VALUE");
+	self.debug(res);
 	if (isObject(res)) {
-		self.pao.pa_wiLog("THE RES IS AN OBJECT");
-		self.pao.pa_wiLog(res);
+		self.debug("THE RES IS AN OBJECT");
+		self.debug(res);
 		con = res.condixion;
 		connector = res.connector;
 	}
 	if (con.trim().indexOf("GROUP::") === 0) {
-		self.pao.pa_wiLog("THE GROUP:: string is the first");
+		self.debug("THE GROUP:: string is the first");
 		//let groupRegx = /GROUP::/
 		let exStr = con.replace("GROUP::", "").trim();
 		let groupLen = 0;
 		let startStr = "";
 		let conStr = "";
-		self.pao.pa_wiLog("THE extracted string");
-		self.pao.pa_wiLog(exStr);
+		self.debug("THE extracted string");
+		self.debug(exStr);
 		if (typeof parseInt(exStr[0]) === "number") {
-			self.pao.pa_wiLog("extStr type is a number");
+			self.debug("extStr type is a number");
 			// eslint-disable-next-line no-unused-vars
 			groupLen = parseInt(exStr[0]);
 			startStr = exStr.slice(1).trim();
 			if (startStr.indexOf("START") === 0 || startStr.indexOf("$") === 0) {
 				conStr = startStr.replace("START", "").trim();
-				self.pao.pa_wiLog(startStr);
+				self.debug(startStr);
 				let groupCons = "";
 				//  let groupL1Cons = ''
 				//  let groupL2Cons = ''
 				//  let groupL3Cons = ''
 				let grouped = [];
-				self.pao.pa_wiLog("PARSEGROUP EXECUTES THIS FAR");
-				self.pao.pa_wiLog(conStr);
+				self.debug("PARSEGROUP EXECUTES THIS FAR");
+				self.debug(conStr);
 				if (level === 1) {
 					groupCons = conStr.split(";");
-					self.pao.pa_wiLog("LEVEL 1 GROUPCONS");
-					self.pao.pa_wiLog(groupCons);
+					self.debug("LEVEL 1 GROUPCONS");
+					self.debug(groupCons);
 					grouped = groupCons.map((c) => {
-						self.pao.pa_wiLog("THE C CONDITION");
-						self.pao.pa_wiLog(c);
-						self.pao.pa_wiLog(c.indexOf("GROUP::"));
+						self.debug("THE C CONDITION");
+						self.debug(c);
+						self.debug(c.indexOf("GROUP::"));
 						//  self.conditionsConnector()
 						if (c.indexOf("GROUP::") >= 0) {
 							return self.parseGroup(c, 2);
@@ -2659,8 +2655,8 @@ export const parseGroup = function (con, level = 1) {
 					});
 				} else if (level === 2) {
 					groupCons = conStr.split(",");
-					self.pao.pa_wiLog("LEVEL 2 GROUPCONS");
-					self.pao.pa_wiLog(groupCons);
+					self.debug("LEVEL 2 GROUPCONS");
+					self.debug(groupCons);
 					grouped = groupCons.map((c) => {
 						// c = self.conditionsConnector(c)
 						if (c.indexOf("GROUP::") >= 0) {
@@ -2675,17 +2671,17 @@ export const parseGroup = function (con, level = 1) {
 						return self.parseFormatCondition(c);
 					});
 				}
-				self.pao.pa_wiLog("GROUPED");
-				self.pao.pa_wiLog(grouped);
-				self.pao.pa_wiLog(groupCons);
+				self.debug("GROUPED");
+				self.debug(grouped);
+				self.debug(groupCons);
 				fullCon = `${connector} (${grouped.join(" ")})`;
 				// eslint-disable-next-line no-empty
 			} else {
 			}
 		}
 	}
-	self.pao.pa_wiLog("THE FULL GROUPED CONDITION TO BE RETURNED:");
-	self.pao.pa_wiLog(fullCon);
+	self.debug("THE FULL GROUPED CONDITION TO BE RETURNED:");
+	self.debug(fullCon);
 	return fullCon;
 };
 export const parseFormatCondition = function (con, type = null) {
@@ -2699,18 +2695,18 @@ export const parseFormatCondition = function (con, type = null) {
 			let operand = "=";
 			condition.push(`${conList[0]} ${operand} ${conList[2]}`);
 		});
-		self.pao.pa_wiLog("THE search ON CONDITION");
-		self.pao.pa_wiLog(condition);
+		self.debug("THE search ON CONDITION");
+		self.debug(condition);
 		return condition;
 	} else {
 		let condition = "";
-		self.pao.pa_wiLog("THE con ITEM");
-		self.pao.pa_wiLog(con);
+		self.debug("THE con ITEM");
+		self.debug(con);
 		// let conList = con.trim().split(' ')
 		// let conList = con.trim().match(/(?:"^\s\[]+|"[^"]*")+/g)
 		let conList = con.trim().match(/(\[[^\]]+\]|\S+)/g);
-		self.pao.pa_wiLog("THE CONLIST");
-		self.pao.pa_wiLog(conList);
+		self.debug("THE CONLIST");
+		self.debug(conList);
 		let operand = "";
 		let leftoperand = "";
 		let multiCon = false;
@@ -2725,8 +2721,8 @@ export const parseFormatCondition = function (con, type = null) {
 		) {
 			if (conList.indexOf("AGAINST") > 0 && conList.length >= 5) {
 				let oCon = conList.slice(0);
-				self.pao.pa_wiLog("THE O CON");
-				self.pao.pa_wiLog(oCon);
+				self.debug("THE O CON");
+				self.debug(oCon);
 				multiCon = oCon[0].trim().toUpperCase() !== "MATCH" ? true : false;
 				let matchFields = "";
 				let matchKeys = "";
@@ -2743,8 +2739,8 @@ export const parseFormatCondition = function (con, type = null) {
 				matchKeys[0] === "["
 					? (matchKeys = matchKeys.slice(1, matchKeys.length - 1))
 					: "";
-				self.pao.pa_wiLog("THE MATCH FIELDS");
-				self.pao.pa_wiLog(matchFields);
+				self.debug("THE MATCH FIELDS");
+				self.debug(matchFields);
 				let op = "";
 				operand = multiCon ? oCon[3].trim() : oCon[2].trim();
 				let mode = multiCon ? oCon[5] : oCon[4];
@@ -2768,60 +2764,60 @@ export const parseFormatCondition = function (con, type = null) {
 				//created_at FUXIN [ISGREATEROREQUALS fuxin.date_sub.options[fuxin.now,INTERVAL ${intExp} ${intUnit}]]
 				let oCon = conList.slice(0);
 				conFuxin = true;
-				self.pao.pa_wiLog("THE O CON::FUXIN");
-				self.pao.pa_wiLog(oCon);
+				self.debug("THE O CON::FUXIN");
+				self.debug(oCon);
 				multiCon = oCon[1].trim().toUpperCase() !== "FUXIN" ? true : false;
 				let fuxinIndex = multiCon ? 3 : 2;
 				let splicedFuxinArr = oCon.splice(fuxinIndex);
 				oCon.push(splicedFuxinArr.join(" "));
-				self.pao.pa_wiLog(fuxinIndex);
-				self.pao.pa_wiLog(oCon);
-				//  self.pao.pa_wiLog(splicedFuxinArr)
+				self.debug(fuxinIndex);
+				self.debug(oCon);
+				//  self.debug(splicedFuxinArr)
 				// if(oCon.indexOf('FUXIN') > 0){
-				//   self.pao.pa_wiLog('THE FUXIN OP IN SEARCHCONDITIONS')
-				//   self.pao.pa_wiLog(oCon)
+				//   self.debug('THE FUXIN OP IN SEARCHCONDITIONS')
+				//   self.debug(oCon)
 				//   let splicedArray = multiCon ? oCon.splice(3) : oCon.splice(2)
-				//   self.pao.pa_wiLog('THE SPLICED ARRAY')
-				//   self.pao.pa_wiLog(splicedArray)
-				//   self.pao.pa_wiLog(splicedArray.join(' '))
+				//   self.debug('THE SPLICED ARRAY')
+				//   self.debug(splicedArray)
+				//   self.debug(splicedArray.join(' '))
 				//   multiCon ? oCon[3] = splicedArray.join(' ') : oCon[2] = splicedArray.join(' ');
-				//   self.pao.pa_wiLog(oCon)
-				//   self.pao.pa_wiLog(oCon[2].indexOf('['))
+				//   self.debug(oCon)
+				//   self.debug(oCon[2].indexOf('['))
 				//   // throw new Error()
 				if (oCon[fuxinIndex].indexOf("[") >= 0) {
-					self.pao.pa_wiLog("OTHER CONTENT IS IN THE SQUARE BRACKETS");
+					self.debug("OTHER CONTENT IS IN THE SQUARE BRACKETS");
 					let stripedSqBkts = oCon[fuxinIndex].slice(
 						1,
 						oCon[fuxinIndex].length - 1,
 					);
 					stripedSqBkts = stripedSqBkts.trim();
 					// let splitRegex = /([.*?])/g
-					self.pao.pa_wiLog("AFTER THE STRIPED HAS BEEN TRIMMED");
-					self.pao.pa_wiLog(stripedSqBkts);
+					self.debug("AFTER THE STRIPED HAS BEEN TRIMMED");
+					self.debug(stripedSqBkts);
 					let operator = stripedSqBkts.substr(0, stripedSqBkts.indexOf(" "));
 					let functionalStr = stripedSqBkts.substr(
 						stripedSqBkts.indexOf(" ") + 1,
 					);
-					self.pao.pa_wiLog("THE SPLITFUXINCONS");
-					self.pao.pa_wiLog(operator);
-					self.pao.pa_wiLog(functionalStr);
+					self.debug("THE SPLITFUXINCONS");
+					self.debug(operator);
+					self.debug(functionalStr);
 					let gotOperand = self.getOperand(operator);
 					let bakedFuxin = self.fieldFormat(functionalStr);
-					self.pao.pa_wiLog(gotOperand);
-					self.pao.pa_wiLog(bakedFuxin);
+					self.debug(gotOperand);
+					self.debug(bakedFuxin);
 					// throw new Error()
 					condition = multiCon
 						? `${oCon[0]} ${oCon[1]} ${gotOperand} ${bakedFuxin}`
 						: `${oCon[0]} ${gotOperand} ${bakedFuxin}`;
-					self.pao.pa_wiLog("THE CONDITION IN FUXIN TEST");
-					self.pao.pa_wiLog(condition);
+					self.debug("THE CONDITION IN FUXIN TEST");
+					self.debug(condition);
 				}
 				// }
 			}
 		} else {
 			let oCon = conList.slice(0);
-			self.pao.pa_wiLog("THE O CON");
-			self.pao.pa_wiLog(oCon);
+			self.debug("THE O CON");
+			self.debug(oCon);
 			let firstStrItem = oCon[0].trim().toUpperCase();
 			multiCon =
 				firstStrItem === "AND" ||
@@ -2830,9 +2826,9 @@ export const parseFormatCondition = function (con, type = null) {
 					? true
 					: false;
 			let operator = multiCon ? conList[2] : conList[1];
-			self.pao.pa_wiLog("THE MULTICON STATUS:::");
-			self.pao.pa_wiLog(multiCon);
-			self.pao.pa_wiLog(oCon);
+			self.debug("THE MULTICON STATUS:::");
+			self.debug(multiCon);
+			self.debug(oCon);
 			operand = self.getOperand(operator);
 			// switch(operator){
 			//   case 'EQUALS' :
@@ -2871,9 +2867,9 @@ export const parseFormatCondition = function (con, type = null) {
 				: leftoperand.indexOf("KEY::") >= 0
 				? (leftoperand = `${leftoperand.replace("KEY::", "").trim()}`)
 				: (leftoperand = `'${leftoperand}'`);
-			self.pao.pa_wiLog("THE VALUE OF THE LEFFFFFT OPERAND");
-			self.pao.pa_wiLog(leftoperand);
-			self.pao.pa_wiLog(leftoperand.indexOf("KEY::"));
+			self.debug("THE VALUE OF THE LEFFFFFT OPERAND");
+			self.debug(leftoperand);
+			self.debug(leftoperand.indexOf("KEY::"));
 		}
 		if (!conFuxin) {
 			match
@@ -2882,8 +2878,8 @@ export const parseFormatCondition = function (con, type = null) {
 				? (condition += `${whiteSpace} ${conList[0]} ${conList[1]} ${operand} ${leftoperand}`)
 				: (condition += `${conList[0]} ${operand} ${leftoperand}`);
 		}
-		self.pao.pa_wiLog("THE search FROM CONDITION");
-		self.pao.pa_wiLog(condition);
+		self.debug("THE search FROM CONDITION");
+		self.debug(condition);
 		return condition;
 	}
 };
@@ -2925,11 +2921,11 @@ export const getOperand = function (operator) {
 export const conditionsConnector = function (c) {
 	const self = this;
 	let connector = {};
-	self.pao.pa_wiLog("THE INDEX OF GROUP:: IN CONDITIONS CONNECTOR");
-	self.pao.pa_wiLog(c.trim().indexOf("GROUP::"));
-	self.pao.pa_wiLog(c);
+	self.debug("THE INDEX OF GROUP:: IN CONDITIONS CONNECTOR");
+	self.debug(c.trim().indexOf("GROUP::"));
+	self.debug(c);
 	if (c.trim().indexOf("GROUP::") > 0) {
-		self.pao.pa_wiLog("THE INDEX OF GROUP IS AT ONE");
+		self.debug("THE INDEX OF GROUP IS AT ONE");
 		if (c.trim().indexOf("AND") === 0) {
 			connector.connector = ` AND`;
 			connector.condixion = c.replace("AND", "").trim();
@@ -2949,15 +2945,15 @@ export const set = function (set, multiSets = false) {
 	const self = this;
 	const pao = self.pao;
 	const objectToArray = pao.pa_objectToArray;
-	self.pao.pa_wiLog("THE SET");
-	self.pao.pa_wiLog(set);
-	self.pao.pa_wiLog(multiSets);
+	self.debug("THE SET");
+	self.debug(set);
+	self.debug(multiSets);
 	let setStrings = "";
 	set.forEach((s, i) => {
 		let setString = "";
 		let modSet = objectToArray(s, true);
-		self.pao.pa_wiLog("THE CONVERTED SET OBJECT");
-		self.pao.pa_wiLog(modSet);
+		self.debug("THE CONVERTED SET OBJECT");
+		self.debug(modSet);
 		modSet.forEach((col, pos) => {
 			multiSets
 				? (setString +=
@@ -2974,12 +2970,12 @@ export const set = function (set, multiSets = false) {
 		// let value = ''
 		// key = Object.keys(s)[0]
 		// value = s[Object.keys(s)[0]]
-		// self.pao.pa_wiLog('THE LENGTH OF S')
-		// self.pao.pa_wiLog(set.length)
-		// self.pao.pa_wiLog(i)
+		// self.debug('THE LENGTH OF S')
+		// self.debug(set.length)
+		// self.debug(i)
 		// setString += i === set.length - 1 ? `${key} = "${value}"` : `${key} = "${value}", `
 	});
-	self.pao.pa_wiLog("THE SETSTRINGS");
-	self.pao.pa_wiLog(setStrings);
+	self.debug("THE SETSTRINGS");
+	self.debug(setStrings);
 	return setStrings;
 };

@@ -12,18 +12,18 @@ export const handleAttachMiddleware = function (data) {
 export const handleConfigMiddleware = function (data) {
 	// console.log("CONFIG MIDDLEWARE", data);
 	const self = this;
-	//  self.pao.pa_wiLog('THE HANDLE CONFIG MIDDLEWARE')
-	//  self.pao.pa_wiLog(data)
-	//  self.pao.pa_wiLog(data)
+	//  self.debug('THE HANDLE CONFIG MIDDLEWARE')
+	//  self.debug(data)
+	//  self.debug(data)
 	let middlewares = data;
-	//  self.pao.pa_wiLog(middlewares)
+	//  self.debug(middlewares)
 	for (let p in middlewares) {
-		// self.pao.pa_wiLog('THE P')
-		// self.pao.pa_wiLog(p)
+		// self.debug('THE P')
+		// self.debug(p)
 		if (self.middlewares[p]) {
 			if (middlewares[p].addMiddleware) {
-				// self.pao.pa_wiLog('INSIDE EXISTENT MIDDLEWARE ITEM')
-				// self.pao.pa_wiLog(middlewares[p])
+				// self.debug('INSIDE EXISTENT MIDDLEWARE ITEM')
+				// self.debug(middlewares[p])
 				// eslint-disable-next-line no-unused-vars
 				middlewares[p].addMiddleware.forEach((m, i) => {
 					self.middlewares[p].push(m);
@@ -43,7 +43,7 @@ export const handleConfigMiddleware = function (data) {
 export const handleAddExternalMiddleware = function (data) {
 	const self = this;
 	const pao = self.pao;
-	self.pao.pa_wiLog("ADD EXTERNAL MIDDLEWARE EVENT HAS OCCURED");
+	self.debug("ADD EXTERNAL MIDDLEWARE EVENT HAS OCCURED");
 	if (data.type) {
 		if (data.type === "private") {
 			if (data.level === "top") {
@@ -57,8 +57,8 @@ export const handleAddExternalMiddleware = function (data) {
 						});
 					});
 				} else {
-					self.pao.pa_wiLog("THE MIDDLEWARES BEFORE");
-					self.pao.pa_wiLog(self.middlewares);
+					self.debug("THE MIDDLEWARES BEFORE");
+					self.debug(self.middlewares);
 					if (self.middlewares.pprivate) {
 						let len = Object.keys(self.middlewares.pprivate).length;
 						self.middlewares.pprivate[len] = {
@@ -66,8 +66,8 @@ export const handleAddExternalMiddleware = function (data) {
 							value: data.middleware.funk,
 							ext: true,
 						};
-						self.pao.pa_wiLog("Middlewares");
-						self.pao.pa_wiLog(self.middlewares);
+						self.debug("Middlewares");
+						self.debug(self.middlewares);
 					}
 				}
 				// eslint-disable-next-line no-empty
@@ -85,10 +85,10 @@ export const handleAddExternalMiddleware = function (data) {
 export const attachMiddleware = function (data) {
 	const self = this;
 	if (data.app) {
-		// self.pao.pa_wiLog('SELF.MIDDLEWARES')
-		// self.pao.pa_wiLog(self.middlewares)
+		// self.debug('SELF.MIDDLEWARES')
+		// self.debug(self.middlewares)
 		if (self.all.length > 0) {
-			self.pao.pa_wiLog("THE Allwares is greater than zero");
+			self.debug("THE Allwares is greater than zero");
 			if (data.xpress) {
 				self.allWares(data.app, data.xpress);
 			}
@@ -121,8 +121,8 @@ export const attachMiddleware = function (data) {
 			// 	self.middlewares.all,
 			// );
 
-			// self.pao.pa_wiLog('FOR EVERY REQUEST MIDDLEWARES')
-			// self.pao.pa_wiLog(self.middlewares.all)
+			// self.debug('FOR EVERY REQUEST MIDDLEWARES')
+			// self.debug(self.middlewares.all)
 			// eslint-disable-next-line no-unused-vars
 			self.middlewares.all.forEach((m, i) => {
 				// console.log("MIDDLEWARE ALL", m);
@@ -145,16 +145,16 @@ export const allWares = function (app, xpress) {
 	// eslint-disable-next-line no-unused-vars
 	self.all.forEach((w, i) => {
 		if (pao.pa_isObject(w)) {
-			self.pao.pa_wiLog("Executing allwares");
+			self.debug("Executing allwares");
 			if (w.use) {
-				self.pao.pa_wiLog("The public:", w.call);
+				self.debug("The public:", w.call);
 				app.use(xpress[w.call]("public"));
 			} else {
-				self.pao.pa_wiLog("The none-public:", w.call);
+				self.debug("The none-public:", w.call);
 				app.use(xpress[w.call]());
 			}
 		} else {
-			self.pao.pa_wiLog("middleware is string");
+			self.debug("middleware is string");
 			app.use(xpress[w]());
 		}
 	});

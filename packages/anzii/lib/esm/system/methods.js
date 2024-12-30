@@ -14,20 +14,15 @@ export const init = function () {
 			this.handleDistributeSystemResources.bind(this),
 		"attach-workers-to-server": this.handleServerAttachWorkers.bind(this),
 	});
-	// self.pao.pa_wiLog(this.env)
+	// self.debug(this.env)
 };
 export const handleConfigureSystem = function (data) {
 	const self = this;
-	self.pao.pa_wiLog(`System ENVIROMENT IS: ${self.env}`, process.env);
-	self.pao.pa_wiLog(self.env);
-	// self.pao.pa_wiLog(cwd)
-	// self.pao.pa_wiLog(path.sep)
-	// self.pao.pa_wiLog(path.sep+'includes')
-	// self.pao.pa_wiLog(cwd.substr(0, cwd.indexOf(path.sep+'includes')) >= 0)
-	self.pao.pa_wiLog(self.systemBase?.DOCUMENT_ROOT);
+	self.debug(`System ENVIROMENT IS: ${self.env}`, process.env);
+	self.debug(self.systemBase?.DOCUMENT_ROOT);
 	self.handleShutDowns();
 	self.clusterCustomConfig = data;
-	self.adLog("The system is about to emit system resources to premier modules");
+
 	self.emit({
 		type: "take-premier-system-base",
 		data: { systemBase: self.systemBase },
@@ -48,22 +43,22 @@ export const handleDistributeSystemResources = async function (data) {
 	let createPath = `${self.systemBase.DOCUMENT_ROOT}${path.sep}`;
 	// const path = self.path
 	// const cwd = process.cwd()
-	// self.pao.pa_wiLog(cwd)
-	// self.pao.pa_wiLog(path.sep)
-	// self.pao.pa_wiLog(path.sep+'includes')
-	// self.pao.pa_wiLog(cwd.substr(0, cwd.indexOf(path.sep+'includes')) >= 0)
-	// self.pao.pa_wiLog('HandleDistributeSystemResources ')
+	// self.debug(cwd)
+	// self.debug(path.sep)
+	// self.debug(path.sep+'includes')
+	// self.debug(cwd.substr(0, cwd.indexOf(path.sep+'includes')) >= 0)
+	// self.debug('HandleDistributeSystemResources ')
 	// // let files = await getFiles(dirPath,{recursive: false},'sev.js')
 	// let dirs = await getDirs(dirPath)
 	// let file = await getFile(filePath)
 	let status = await makeDirs(createPath);
 	let ext = getExtension("sev.js");
-	// self.pao.pa_wiLog('GET FILES CALLBACK GETS A CALL')
-	// self.pao.pa_wiLog(files)
-	// self.pao.pa_wiLog(dirs)
-	// self.pao.pa_wiLog(file)
-	self.pao.pa_wiLog(ext);
-	self.pao.pa_wiLog(status);
+	// self.debug('GET FILES CALLBACK GETS A CALL')
+	// self.debug(files)
+	// self.debug(dirs)
+	// self.debug(file)
+	self.debug(ext);
+	self.debug(status);
 	self.emit({
 		type: "take-system-base",
 		data: { systemBase: self.systemBase },
@@ -72,33 +67,32 @@ export const handleDistributeSystemResources = async function (data) {
 };
 export const shutDown = function (type, code) {
 	const self = this;
-	console.log(`SHUTDOWN TYPE: ${type},code: ${code}`);
-	console.log(code);
+	self.infoSync(`SHUTDOWN TYPE: ${type},code: ${code}`);
+	self.error(code);
 	self.systemIsShuttingDown = true;
 	if (self.shutDownServices.length > 0) {
 		self.shutDownServices.forEach((sd, i) => {
 			if (typeof sd !== "function") {
-				console.log(
+				self.logSync(
 					`Service: ${self.shutDownOrder[i]} must be a function,shutdown attempt failed`,
 					"warn",
 				);
 			} else {
-				console.log(
+				self.logSync(
 					`Service: ${self.shutDownOrder[i]} is shutting down`,
 					"info",
 				);
 			}
 		});
 	}
-	console.log(
+	self.logSync(
 		`System is shutting down through: ${type},with code: ${code.stack}`,
 	);
 	type === "uncaughtException" ? self.context.kill(1) : self.context[type]();
 };
 export const masterWorker = function (app, system) {
 	const self = this;
-	// console.log("ENV PORT", self?.context?.env?.PORT);
-	// console.log("THE System data", system);
+
 	const serverTimeout = self.serverTimeout;
 	const portToUse = self?.context?.env?.PORT ? self?.context?.env?.PORT : 3000;
 	const shouldOpenBrowser = self?.context?.env?.ANZII_OPEN_BROWSER
@@ -131,13 +125,12 @@ export const masterWorker = function (app, system) {
 	self
 		.getServerPort(portToUse, useAvailablePort)
 		.then((availablePort) => {
-			self.pao.pa_wiLog(`THE AVAILABLE PORT, ${availablePort}`);
-			self.pao.pa_wiLog(`THE STATUS OF isMaster: ${self.cluster.isMaster}`);
-			self.pao.pa_wiLog(`THE cluster, ${self.cluster}`);
-			self.pao.pa_wiLog(`THE CLUSTERS, ${self.clusterCustomConfig}`);
+			self.debug(`THE STATUS OF isMaster: ${self.cluster.isMaster}`);
+			self.debug(`THE cluster`, self.cluster);
+			self.debug(`THE CLUSTERS`, self.clusterCustomConfig);
 			serverSettings["availablePort"] = availablePort;
 			if (self.cluster.isMaster) {
-				self.pao.pa_wiLog(`Master ${self.context.pid} is running`);
+				self.debug(`Master ${self.context.pid} is running`);
 				if (self.clusterCustomConfig && self.clusterCustomConfig.spawn) {
 					let slaves = self.clusterCustomConfig.workers
 						? self.clusterCustomConfig.workers
@@ -150,69 +143,67 @@ export const masterWorker = function (app, system) {
 					} else {
 						if (typeof slaves === "number") {
 							for (let s = 0; s < slaves; s++) {
-								self.pao.pa_wiLog(`Forking slave number: ${s}`);
+								self.debug(`Forking slave number: ${s}`);
 								self.cluster.fork();
 							}
 						}
 					}
 					self.cluster.on("fork", (worker) => {
-						self.pao.pa_wiLog("cluster forking new worker", worker.id);
+						self.debug("cluster forking new worker", worker.id);
 					});
 					let mainWorkerId = null;
 					self.cluster.on("listening", (worker, address) => {
-						self.pao.pa_wiLog("cluster listening new worker", worker.id);
+						self.debug("cluster listening new worker", worker.id);
 						if (null === mainWorkerId) {
-							self.pao.pa_wiLog(
-								"Making worker " + worker.id + " to main worker",
-							);
+							self.debug("Making worker " + worker.id + " to main worker");
 							mainWorkerId = worker.id;
 							worker.send({ singleProcessTasks: "startSingleProcessTasks" });
 						}
 					});
 					self.cluster.on("exit", (worker, code, signal) => {
-						self.pao.pa_wiLog(`worker ${worker.process.pid} died`);
-						self.pao.pa_wiLog("FORKING ANOTHER WORK");
-						self.pao.pa_wiLog("Worker %d died :(", worker.id);
+						self.debug(`worker ${worker.process.pid} died`);
+						self.debug("FORKING ANOTHER WORK");
+						self.debug("Worker %d died :(", worker.id);
 						if (!shouldStopServer) {
 							if (worker.id === mainWorkerId) {
-								self.pao.pa_wiLog("Main Worker is dead...");
+								self.debug("Main Worker is dead...");
 								mainWorkerId = null;
 							}
-							self.pao.pa_wiLog("I am here");
-							self.pao.pa_wiLog(worker);
-							self.pao.pa_wiLog(code);
-							self.pao.pa_wiLog(signal);
+							self.debug("I am here");
+							self.debug(worker);
+							self.debug(code);
+							self.debug(signal);
 							self.cluster.fork();
 							// self.cluster.fork()
 						} else {
-							console.log("Server has been shutdown");
+							self.debug("Server has been shutdown");
 						}
 					});
 				} else {
-					self.adLog("System is running on a single thread/core");
+					self.logSync("System is running on a single thread/core");
 					self
 						.runServer(app, serverSettings)
 						.then((started) => {
-							console.log("The server has been started", started);
+							self.debug("The server has been started", started);
 						})
 						.catch((err) => {
-							console.log("The was an error running the server", err);
+							self.error("The was an error running the server", err);
 						});
 				}
 			} else {
-				// self.pao.pa_wiLog('IT IS NOT THE MASTER PROCESS')
-				self.pao.pa_wiLog(`Worker ${process.pid} started`);
+				// self.debug('IT IS NOT THE MASTER PROCESS')
+				self.debug(`Worker ${process.pid} started`);
 				self
 					.runServer(app, serverSettings)
 					.then((started) => {
-						console.log("The server has been started", started);
+						self.debug("The server has been started", started);
 					})
 					.catch((err) => {
-						console.log("The was an error running the server", err);
+						self.error("The was an error running the server", err);
 					});
 
 				process.on("message", function (message) {
-					self.pao.pa_wiLog(
+					self.debug(
 						"Worker " + process.pid + " received message from master.",
 						message,
 					);
@@ -223,14 +214,14 @@ export const masterWorker = function (app, system) {
 			}
 		})
 		.catch((err) => {
-			console.log("Server could not be started due to a port isssue", err);
+			self.error("Server could not be started due to a port isssue", err);
 		});
 };
 // export const folkSlaveWorkers = function(mainWorker){
 // }
 export const handleShutDowns = function () {
 	const self = this;
-	self.pao.pa_wiLog("Shutdowns are being handled");
+	self.debug("Shutdowns are being handled");
 	self.context.on("INT", function (code) {
 		if (!self.systemIsShuttingDown) {
 			self.shutDown("kill", code);
@@ -279,7 +270,7 @@ export const handleRegisterShutDownCandidate = function (data) {
 			self.shutDownOrder.push(data.name);
 		}
 	} else {
-		self.pao.pa_wiLog("Candidate could not be registered for shutdown", "warn");
+		self.debug("Candidate could not be registered for shutdown", "warn");
 	}
 };
 export const openBrowserApp = async function (
@@ -297,23 +288,16 @@ export const openBrowserApp = async function (
 
 export const getServerPort = function (port = 3000, useAvailablePort = true) {
 	const self = this;
-	self.infoSync(`User preffered port: ${port}`);
+
 	return new Promise((resolve, reject) => {
 		if (!useAvailablePort) return resolve(port);
 
 		self
 			.detectPort(port)
 			.then((gotPort) => {
-				// console.log("THE GOT PORT", gotPort);
-				// console.log("THE CHECKED PORT", port);
-				// console.log("THE TYPEOF PORT", typeof port);
-				// console.log("THE TYPEOF GOT PORT", typeof gotPort.toString());
-				// console.log("THE GOT PORT EQUALS PORT", gotPort === port);
-
 				if (gotPort.toString() === port) {
 					resolve(gotPort);
 				} else {
-					// console.log("SEARCHING FOR OPEN PORT");
 					self.portFinder
 						.getPortPromise()
 						.then((openPort) => {
@@ -328,7 +312,6 @@ export const getServerPort = function (port = 3000, useAvailablePort = true) {
 				}
 			})
 			.catch((err) => {
-				// console.log("Therw was an error trying to get a port", err);
 				reject(err);
 			});
 	});
@@ -336,13 +319,13 @@ export const getServerPort = function (port = 3000, useAvailablePort = true) {
 
 export const getSslCerts = function (pathOrSets) {
 	const self = this;
-	self.infoSync(`User preffered port: ${port}`);
+
 	return new Promise((resolve, reject) => {});
 };
 
 export const runServer = function (app, serverSettings) {
 	const self = this;
-
+	self.debug("THE SERVER OPTIONS", serverSettings);
 	return new Promise((resolve, reject) => {
 		const { shouldStopServer, serverTimeout, useHttps } = serverSettings;
 		if (useHttps) {
@@ -374,13 +357,48 @@ export const runHttps = function (app, settings) {
 export const runHttp = function (app, settings) {
 	const self = this;
 	const { availablePort } = settings;
-	self.infoSync(`User preffered port: ${availablePort}`);
+
 	return new Promise((resolve, reject) => {
 		const serv = app.listen(availablePort, () => {
 			self.appListener(settings);
 		});
 		resolve(serv);
 	});
+};
+
+export const appListener = function (settings) {
+	const self = this;
+	const { availablePort, shouldOpenBrowser, protocol, domainToUse } = settings;
+	process.env[
+		"ANZII_APP_URL"
+	] = `${protocol}://${domainToUse}:${availablePort}`;
+	self.infoSync(
+		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort} with domain: ${domainToUse} and Protocol: ${protocol}`,
+	);
+	self.infoSync(
+		`The formed url is ${protocol}://${domainToUse}:${availablePort}`,
+	);
+	self.infoSync(`The app full url: ${process.env.ANZII_APP_URL}`);
+
+	if (shouldOpenBrowser) {
+		self.openBrowserApp(availablePort, protocol, domainToUse);
+	}
+};
+
+export const setServerOptions = function (
+	serv,
+	shouldStopServer = false,
+	serverTimeout,
+) {
+	const self = this;
+	serv.timeout = serverTimeout;
+	setTimeout(function () {
+		if (shouldStopServer) {
+			self.infoSync("ANZII is shutting down server");
+			process.exit(0);
+			//serv.close();
+		}
+	}, 3000);
 };
 
 export const createCustomDomain = function () {
@@ -406,7 +424,7 @@ export const createCustomDomain = function () {
 				data: {
 					payload: { config },
 					callback: (fromOpenSSl) => {
-						console.log("THE SSL ", fromOpenSSl);
+						// console.log("THE SSL ", fromOpenSSl);
 					},
 				},
 			});
@@ -429,7 +447,6 @@ export const readHostsFile = function (next) {
 	const self = this;
 	const operatingSystem = self.getSystemType();
 	let hostsFilePath = null;
-	console.log("THE OPERATING SYSTEM", operatingSystem);
 
 	switch (operatingSystem) {
 		case "darwin":
@@ -440,10 +457,10 @@ export const readHostsFile = function (next) {
 	}
 
 	let data = fs.readFileSync(hostsFilePath, { encoding: "utf-8" });
-	console.log("THE HOSTS DATA", data);
+
 	let newHostEntry = `127.0.0.1 example.com`;
 	data += newHostEntry + "\n";
-	console.log("NEW DATA", data);
+
 	fs.writeFileSync(hostsFilePath, data);
 	next(null, data);
 
@@ -453,48 +470,4 @@ export const readHostsFile = function (next) {
 export const getSystemType = function () {
 	const self = this;
 	return os.platform();
-};
-
-export const appListener = function (settings) {
-	const self = this;
-	const { availablePort, shouldOpenBrowser, protocol, domainToUse } = settings;
-	process.env[
-		"ANZII_APP_URL"
-	] = `${protocol}://${domainToUse}:${availablePort}`;
-	self.infoSync(
-		`The Application is running on PID:: ${process.pid} and listening on port: ${availablePort} with domain: ${domainToUse} and Protocol: ${protocol}`,
-	);
-	self.infoSync(
-		`The formed url is ${protocol}://${domainToUse}:${availablePort}`,
-	);
-	self.infoSync(`The app full url: ${process.env.ANZII_APP_URL}`);
-	// self.adLog("The Application is listening via workers");
-	// self.pao.pa_wiLog("THIS WORKER RUNNING IP:");
-	// self.createCustomDomain().then((result) => {
-	// 	console.log("Domain created", result);
-	// });
-	// self.createCustomDomain();
-	// let protocol = isHttps ? "https" : "http";
-	// let domainToUse = process.env?.ANZII_USE_CUSTOM_DOMAIN
-	// 	? process.env?.ANZII_USE_CUSTOM_DOMAIN
-	// 	: "localhost";
-	if (shouldOpenBrowser) {
-		self.openBrowserApp(availablePort, protocol, domainToUse);
-	}
-};
-
-export const setServerOptions = function (
-	serv,
-	shouldStopServer = false,
-	serverTimeout,
-) {
-	const self = this;
-	serv.timeout = serverTimeout;
-	setTimeout(function () {
-		if (shouldStopServer) {
-			console.log("CLOSING SERVER");
-			process.exit(0);
-			//serv.close();
-		}
-	}, 3000);
 };

@@ -30,7 +30,7 @@ export const handleDataHiveRequest = function (data) {
 };
 export const handleDaoTakeDbs = function (data) {
 	const self = this;
-	self.pao.pa_wiLog("Handling Hive Request");
+	self.debug("Handling Hive Request");
 	if (self.DBS === null) {
 		self.DBS = {};
 		self.connectors = {};
@@ -40,6 +40,6 @@ export const handleDaoTakeDbs = function (data) {
 		self.DBS[data.vendor] = data.conn;
 		self.connectors[data.vendor] = data.connector;
 	}
-	// self.pao.pa_wiLog('The dbs inside self.DBS')
-	//self.pao.pa_wiLog(self.DBS)
+	// self.debug('The dbs inside self.DBS')
+	//self.debug(self.DBS)
 };

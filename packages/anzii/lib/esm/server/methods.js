@@ -30,7 +30,7 @@ export const handleConfigServer = function (data) {
 };
 export const handleDomainResources = function (data = null) {
 	const self = this;
-	self.pao.pa_wiLog("THE server is emitting system defaults event");
+	self.debug("THE server is emitting system defaults event");
 	//Custom to be removed
 	// self.emit({
 	// 	type: "set-domain-defaults",
@@ -131,7 +131,7 @@ export const handleWriteServerRequestResponse = async function (data) {
 			data.res.status(200).send(data.data);
 		}
 		// await data.res.end()
-		// // self.pao.pa_wiLog(data.data)
+		// // self.debug(data.data)
 		return await self.log("SERVER HAS SENT A RESPONSE BACK TO CLIENT");
 	}
 };
