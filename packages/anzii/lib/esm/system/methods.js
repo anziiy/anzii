@@ -125,6 +125,7 @@ export const masterWorker = function (app, system) {
 		domainToUse: appDomain,
 		serverTimeout,
 		appOpts: system?.appOpts,
+		shouldStopServer,
 	};
 
 	self
