@@ -10,9 +10,9 @@ export const handleConfigureDBMan = function (data) {
 	const pao = self.pao;
 	self.infoSync("The database credentials");
 	self.infoSync(data);
-	//   self.pao.pa_wiLog('THE DBMAN HANLDECONFIGURE')
-	//   self.pao.pa_wiLog('THE SUPPORTED CLIENTS')
-	//   self.pao.pa_wiLog(self.supportedClients)
+	//   self.debug('THE DBMAN HANLDECONFIGURE')
+	//   self.debug('THE SUPPORTED CLIENTS')
+	//   self.debug(self.supportedClients)
 	if (!pao.pa_isObject(data)) {
 		self.logSync(
 			`No database client specified,System will use default`,
@@ -36,9 +36,7 @@ export const handleConfigureDBMan = function (data) {
 								`Client: "${c.name} is not supported by the system"`,
 							);
 						} else {
-							self.pao.pa_wiLog(
-								"THE SYSTEM IS ABOUT TO CONNECT TO THE THE SERVER",
-							);
+							self.debug("THE SYSTEM IS ABOUT TO CONNECT TO THE THE SERVER");
 							self.connectToClient(c);
 						}
 					});
@@ -61,10 +59,10 @@ export const connectToClient = function (client) {
 };
 export const getClientDriver = function (client) {
 	const self = this;
-	self.pao.pa_wiLog(`System is getting a client driver`);
-	self.pao.pa_wiLog("THE OTHER DETAILS BELOW");
-	self.pao.pa_wiLog(client.name);
-	self.pao.pa_wiLog(client.name === "mysql");
+	self.debug(`System is getting a client driver`);
+	self.debug("THE OTHER DETAILS BELOW");
+	self.debug(client.name);
+	self.debug(client.name === "mysql");
 	try {
 		let name = client.name;
 		if (name === "mysql") {
@@ -93,18 +91,19 @@ export const getClientDriver = function (client) {
 		// 	break;
 		// }
 		if (!self.supportedClients[client.name].driver) {
-			self.pao.pa_wiLog("THE DRIVER REQUIREMENT FAILED");
+			self.debug("THE DRIVER REQUIREMENT FAILED");
 			self.throwError("Failed to get client driver module");
 		}
 		self.connect(client);
 	} catch (e) {
-		self.pao.pa_wiLog("THE DRIVER CONNECT ERROR");
-		self.pao.pa_wiLog(e.stack);
+		self.debug("THE DRIVER CONNECT ERROR");
+		self.debug(e.stack);
 	}
 };
 export const connect = function (client) {
 	const self = this;
 	self.infoSync(`System is connecting to client: ${client.name}`);
+	self.infoSync(client.connect);
 	try {
 		let sclient = self.supportedClients[client.name];
 		let opts = {
@@ -120,15 +119,15 @@ export const connect = function (client) {
 		//  self.infoSync(opts)
 		let res = sclient.driver[sclient.connectMethod](opts, (err, res) => {
 			if (err) {
-				self.pao.pa_wiLog("THE ACTUAL CONNECTION ERROR");
-				self.pao.pa_wiLog(err.stack);
+				self.debug("THE ACTUAL CONNECTION ERROR");
+				self.debug(err.stack);
 			} else {
 				self.DBS[client.name] = res;
 				self.infoSync("System has successfully connected to client");
 				self.infoSync(`Client ready to serve queries`);
 			}
 		});
-		//   self.pao.pa_wiLog(res)
+		//   self.debug(res)
 		// eslint-disable-next-line no-unused-vars
 		res.query("SELECT 1 + 1 AS solution", function (error, results, fields) {
 			if (error) throw error;
@@ -146,8 +145,8 @@ export const connect = function (client) {
 		});
 		// res.query(function(e){
 		// 	if(e){
-		// 		self.pao.pa_wiLog('THE SYSTEM HAS FAILED TO CONNECT TO THE DATABASE, please refer to the error below:')
-		// 		self.pao.pa_wiLog(e.message)
+		// 		self.debug('THE SYSTEM HAS FAILED TO CONNECT TO THE DATABASE, please refer to the error below:')
+		// 		self.debug(e.message)
 		// 		throw new Error(e)
 		// 	}else{
 		// 		self.DBS[client.name] = res
@@ -157,17 +156,17 @@ export const connect = function (client) {
 		// 		self.adLog(`Client ready to serve queries`)
 		// 	}
 		// })
-		//   self.pao.pa_wiLog('THE RESULTS')
+		//   self.debug('THE RESULTS')
 		//   res.query('SELECT 1 + 1 AS solution', function (error, results, fields) {
 		// 	if (error) throw error;
-		// 	self.pao.pa_wiLog('THE CONNECTION TO THE DATABASE')
-		// 	self.pao.pa_wiLog('The solution is: ', results[0].solution);
+		// 	self.debug('THE CONNECTION TO THE DATABASE')
+		// 	self.debug('The solution is: ', results[0].solution);
 		//   });
 		//   res.query()
 	} catch (e) {
 		self.infoSync("THE CONNECTION ERROR");
 		self.infoSync(e.stack);
-		self.pao.pa_wiLog("THE CONNECTION EROR");
-		self.pao.pa_wiLog(e.stack);
+		self.debug("THE CONNECTION EROR");
+		self.debug(e.stack);
 	}
 };

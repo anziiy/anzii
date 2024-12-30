@@ -12,11 +12,11 @@ export const handleSetDomainDefaults = function (data) {
 	const passport = self.passport;
 
 	const path = self.path;
-	self.infoSync("SETTING DOMAIN DEFAULTS");
-	self.pao.pa_wiLog(`Domain resources data, ${data}`);
-	self.pao.pa_wiLog(`THE DOMAINS, ${domains}`);
-	self.pao.pa_wiLog(`THE DOMAINS PASSPORT, ${passport}`);
-	self.pao.pa_wiLog(`THE PASSPORT, ${self.passportInitialize}`);
+	// self.infoSync("SETTING DOMAIN DEFAULTS");
+	// self.pao.pa_wiLog(`Domain resources data, ${data}`);
+	// self.pao.pa_wiLog(`THE DOMAINS, ${domains}`);
+	// self.pao.pa_wiLog(`THE DOMAINS PASSPORT, ${passport}`);
+	// self.pao.pa_wiLog(`THE PASSPORT, ${self.passportInitialize}`);
 	// self.pao.pa_wiLog(data)
 	self.pao.pa_wiLog(self.system);
 	// self.pao.pa_wiLog(data)
@@ -24,27 +24,28 @@ export const handleSetDomainDefaults = function (data) {
 	// self.pao.pa_wiLog(`PATH", ${data.custom.webpackConfig.output.path}`);
 	if (!domains) return;
 	domains.forEach((dumain) => {
-		self.pao.pa_wiLog("THE DOMAIN SETTInGS");
-		self.pao.pa_wiLog(dumain);
+		// self.pao.pa_wiLog("THE DOMAIN SETTInGS");
+		// self.pao.pa_wiLog(dumain);
 		if (dumain.name === "views")
 			return data.app.set(
 				dumain.name,
 				path.join(self.system?.DOCUMENT_ROOT, dumain.set),
 			);
 		if (dumain.name === "static") {
-			self.pao.pa_wiLog("DOMAIN IS STATIC");
-			self.pao.pa_wiLog(
-				`${path.join(self.system?.DOCUMENT_ROOT)}, ${dumain.set}`,
-			);
-			self.pao.pa_wiLog(`DOMAIN IS STATIC", ${dumain}`);
-			self.pao.pa_wiLog(`DOCUMENT ROOT", ${self.system?.DOCUMENT_ROOT}`);
-			self.pao.pa_wiLog(
-				"JOINED PATH",
-				path.join(self.system?.DOCUMENT_ROOT, dumain.set),
-			);
-			return data.app.use(
-				data.xpress.static(path.join(self.system?.DOCUMENT_ROOT, dumain.set)),
-			);
+			// self.pao.pa_wiLog("DOMAIN IS STATIC");
+			// self.pao.pa_wiLog(
+			// 	`${path.join(self.system?.DOCUMENT_ROOT)}, ${dumain.set}`,
+			// );
+			let appRoot = self.system?.DOCUMENT_ROOT;
+			let appStaticFull = `${path.join(
+				self.system?.DOCUMENT_ROOT,
+				dumain.set,
+			)}`;
+			// console.log("THE APP ROOT", appRoot);
+			// console.log("THE APP FULL STATIC", appStaticFull);
+			let domainStatic = dumain?.absolute ? dumain.set : appStaticFull;
+			// console.log("THE STATIC DOMAIN", domainStatic);
+			return data.app.use(data.xpress.static(domainStatic));
 		}
 		if (dumain.name === "passport") return data.app.use(passport.initialize());
 		// if (dumain.name === "webpackDevMiddleware")

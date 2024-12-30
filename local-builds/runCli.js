@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import createTarball from "./createTarball.js";
+import npmPublish from "./npmPublish.js";
 import parseScriptArguments from "./parseScriptArguments.js";
 import publishYalcPackage from "./publishYalcPackage.js";
 import runNpmScript from "./runNpmScript.js";
@@ -142,6 +143,34 @@ if (operationToRun === "tarball") {
 				}
 			});
 		}
+	});
+} else if (operationToRun === "npmPublish") {
+	if (possibleArgs.length === 1) {
+		throw new Error("RUNCLI requires a package name to be published");
+	}
+	if (possibleArgs.length < 4) {
+		throw new Error("RUNCLI requires atleast 2 publish commands");
+	}
+	const publishPackageName = possibleArgs[1];
+	let versionCommand = `${possibleArgs[2]} ${possibleArgs[3]}`;
+
+	// const install = possibleArgs[2];
+	// const shouldInstallOnDeps = install && install === "install" ? true : false;
+	const toBePublishedPath = path.join(packagesPath, publishPackageName);
+	let context = { context: toBePublishedPath, publishPackageName };
+	let operations = [1];
+
+	if (possibleArgs.length > 4) {
+		operations.push(2);
+	}
+	console.log("THE OPERATIONS", operations);
+	operations.forEach((op, i) => {
+		let comm = i == 0 ? versionCommand : possibleArgs[4];
+		console.log("THE COMM", comm);
+		npmPublish({
+			...context,
+			publishCommand: comm,
+		});
 	});
 }
 

@@ -22,6 +22,7 @@
 		"root:tests": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
 		"lint": "eslint",
 		"tarball": "node local-builds/runCli.js tarball",
+		"publish": "node local-builds/runCli.js npmPublish",
 		"local:publish": "node local-builds/runCli.js publish",
 		"local:co:pub:in": "node local-builds/runCli.js copubin"
 	},

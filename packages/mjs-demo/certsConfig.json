@@ -1,0 +1,34 @@
+{
+	"actions": [
+		{
+			"action": "generate-rsa",
+			"options": {
+				"outputPath": "generated-key.pem",
+				"text": true,
+				"keyBitsLength": 2048
+			}
+		},
+		{
+			"action": "create-certificate-signing-request",
+			"options": {
+				"new": true,
+				"sha256": true,
+				"text": true,
+				"key-source": "generated-key.pem",
+				"outputPath": "generated-csr.csr"
+			}
+		},
+		{
+			"action": "create-self-signed-certificate-request",
+			"options": {
+				"x509": true,
+				"sha256": true,
+				"text": true,
+				"days": 31,
+				"key-source": "generated-key.pem",
+				"input-source": "generated-csr.csr",
+				"outputPath": "generated-certificate.pem"
+			}
+		}
+	]
+}

@@ -1,9 +1,7 @@
 import { logInitializations } from "./activiator_logs.js";
 export const Activate = function (libs = []) {
-	logInitializations("The Server");
-	logInitializations("THE LIBS");
-	logInitializations(libs);
-	logInitializations(this.ESM.Esm);
+	logInitializations("THE LIBS", libs);
+	logInitializations("The esm modules", this.ESM.Esm);
 	const core = new this.ANZII.CORE(this.ANZII.PILLAR);
 	const pao = new this.ANZII.PAO(core);
 	const isAppCli = pao.PROMPT.indexOf("cli") >= 0 ? true : false;
@@ -54,20 +52,17 @@ export const Activate = function (libs = []) {
 	// let global = pao.pa_clone(this.ESM.Esm.Global)
 	// delete this.ESM.Esm.Global
 	libs.unshift(anziiloger);
-	logInitializations("THE CORE");
-	logInitializations(libs);
+	logInitializations("THE CORE", libs);
+
 	libs.push(this.ESM.Esm);
 	isPush ? libs.push(IO) : "";
 	// libs.push(global)
 	libs.forEach((lib) => {
 		for (let moco in lib) {
-			logInitializations("Inside activate");
-			logInitializations(moco);
-			logInitializations("THE LIB MOCO");
-			logInitializations(typeof lib[moco]);
+			logInitializations("Inside activate", moco);
+			logInitializations("THE LIB MOCO", typeof lib[moco]);
 			logInitializations(lib[moco]);
 			let moduId = moco.toLowerCase();
-			logInitializations("THE V");
 			logInitializations(`Currently executing module: ${moco}`);
 			let modInstId = moduId;
 			//logInitializations('Executing module without view')

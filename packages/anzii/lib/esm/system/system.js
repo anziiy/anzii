@@ -16,7 +16,7 @@ class System {
 		this.shutDownServices = [];
 		this.numOfDBSD = 3;
 		this.allowedDBSTR = 10000;
-		this.serverTimeout = 3000;
+		this.serverTimeout = 1000 * 60 * 3;
 		this.systemIsShuttingDown = false;
 		this.shutDownOrder = [];
 		this.systemBase = { DOCUMENT_ROOT: process.cwd() };
@@ -36,6 +36,14 @@ class System {
 		this.shutDown = methods.shutDown;
 		this.openBrowserApp = methods.openBrowserApp;
 		this.getServerPort = methods.getServerPort;
+		this.createCustomDomain = methods.createCustomDomain;
+		this.readHostsFile = methods.readHostsFile;
+		this.getSystemType = methods.getSystemType;
+		this.runServer = methods.runServer;
+		this.runHttps = methods.runHttps;
+		this.runHttp = methods.runHttp;
+		this.appListener = methods.appListener;
+		this.setServerOptions = methods.setServerOptions;
 	}
 }
 export default System;

@@ -2,9 +2,7 @@
 /* eslint-disable no-unused-vars */
 export const init = function () {
 	this.adLog("Server has been initialised");
-	this.adLog("SERVER IS STARTING UP");
-	//   self.pao.pa_wiLog(this.pao)
-	//   self.pao.pa_wiLog(this)
+
 	this.listens({
 		"config-server": this.handleConfigServer.bind(this),
 		"config-domain-resources": this.handleDomainResources.bind(this),
@@ -14,7 +12,11 @@ export const init = function () {
 };
 export const handleConfigServer = function (data) {
 	const self = this;
-	// self.emit({type:'share-middleware',data:''})
+
+	self.emit({
+		type: "set-domain-defaults",
+		data: { app: self.http, xpress: self.xpress },
+	});
 	self.emit({
 		type: "attach-middleware",
 		data: { app: self.http, xpress: self.xpress },
@@ -24,127 +26,67 @@ export const handleConfigServer = function (data) {
 		data: { app: self.http, router: self.router },
 	});
 	self.emit({ type: "distribute-system-resources", data: "" });
-	self.startServer();
+	self.startServer(data);
 };
 export const handleDomainResources = function (data = null) {
 	const self = this;
-	self.pao.pa_wiLog("THE server is emitting system defaults event");
+	self.debug("THE server is emitting system defaults event");
 	//Custom to be removed
-	self.emit({
-		type: "set-domain-defaults",
-		data: { app: self.http, xpress: self.xpress },
-	});
+	// self.emit({
+	// 	type: "set-domain-defaults",
+	// 	data: { app: self.http, xpress: self.xpress },
+	// });
 };
 export const startServer = function (data) {
 	const self = this;
-	// this.startPreRoutes()
-	// this.startRouting()
-	this.runServer();
+	self.runServer(data);
 };
-export const startPreRoutes = function () {
+
+export const runServer = function (data) {
 	const self = this;
-	self.http.use(self.dependiks.bodyParser.json());
-	// self.http.use(function(req, res, next) {
-	// 	// self.pao.pa_wiLog(req.body)
-	// 	// self.pao.pa_wiLog('Your mobile has reached this code Surprise')
-	// 	res.header("Access-Control-Allow-Origin", "*");
-	// 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-	// 	return next();
-	// });
-	self.http.use("*.js", function (req, res, next) {
-		// self.pao.pa_wiLog(req.body)
-		// self.pao.pa_wiLog('Your mobile has reached this code Surprise')
-		res.set("content-type", "text/javascript");
-		return next();
-	});
-	self.http.use(self.xpress.static("public"));
-};
-export const startRouting = function () {
-	const self = this;
-	//   self.http.get('/smarfo/menu',function(req,res){
-	// 	self.pao.pa_wiLog('Request for menu has just been received')
-	// 	let categories = require('./jsondb/foodcategories.json');
-	// 	return res.send(categories.menu);
-	// })
-	self.http.get("/todo", self.renderHtml.bind(self));
-	self.http.get("/ibr", self.renderHtml.bind(self));
-	self.http.get("/home", self.renderHtml.bind(self));
-	self.http.use("/", self.renderHtml.bind(self));
-};
-export const runServer = function () {
-	const self = this;
-	self.emit({ type: "attach-workers-to-server", data: { app: self.http } });
-	// self.http.listen(process.env.PORT || 3000,()=>{
-	//   self.log("The Server is listening",'info')
-	// })
-};
-export const renderHtml = function (req, res) {
-	const self = this;
-	self.pao.pa_wiLog("A request has been made to one of the routes");
-	self.pao.pa_wiLog("The html");
-	self.pao.pa_wiLog("The request URL");
-	self.pao.pa_wiLog(req.url);
-	self.request = {
-		req: req,
-		res: res,
-	};
 	self.emit({
-		type: "address-changed",
-		data: {
-			url: req.url,
-		},
+		type: "attach-workers-to-server",
+		data: { app: self.http, system: data },
 	});
-	//    self.pao.pa_wiLog(this)
 };
+
 export const handleWriteServerRequestResponse = async function (data) {
 	const self = this;
-	self.pao.pa_wiLog("THE DATA TO BE SENT TO CLIENT");
-	self.pao.pa_wiLog(data.method);
-	self.pao.pa_wiLog(data.method === "renderView");
+
 	if (data.method === "stream") {
 		return self.streamResponse(data);
 	} else if (data.method === "renderView") {
-		self.pao.pa_wiLog("THE RENDERVIEW");
-		self.pao.pa_wiLog(data);
 		let view = data.data.data;
-		self.pao.pa_wiLog("MAKING A VIEW request response");
 		data.res.set("Connection", "close");
-		// self.pao.pa_wiLog(data)
-		// self.pao.pa_wiLog(data.method)
-		// self.pao.pa_wiLog(data.data)
-		// self.pao.pa_wiLog(view)
-		// self.pao.pa_wiLog(data.data.type === 'template')
+
 		if (view.type.trim() === "template") {
-			self.pao.pa_wiLog("Rendering template view");
-			self.pao.pa_wiLog(data.data.view);
-			self.pao.pa_wiLog("Rendering inside try");
 			self
 				.getHtml(data.res, view)
 				.then(async (html) => {
-					html.success
-						? (data.res.status(200).send(html.html),
-						  // eslint-disable-next-line no-mixed-spaces-and-tabs
-						  // eslint-disable-next-line no-mixed-spaces-and-tabs
-						  self.infoSync(
+					if (html.success) {
+						data.res.status(200).send(html.html),
+							// eslint-disable-next-line no-mixed-spaces-and-tabs
+							// eslint-disable-next-line no-mixed-spaces-and-tabs
+							self.infoSync(
 								`SERVER HAS SUCCESSFULLY SENT RESPONSE TO CLIENT WITH RESPONSE ID::${
 									data.res.R_ID.split("-")[0]
 								}`,
 								// eslint-disable-next-line no-mixed-spaces-and-tabs
-						  ))
-						: (data.res.status(200).send(html.html),
-						  self.infoSync(
+							);
+					} else {
+						data.res.status(404).send(html.html),
+							self.infoSync(
 								`SERVER HAS SENT A FAILED RESPONSE BACK TO CLIENT WITH RESPONSE ID::${
 									data.res.R_ID.split("-")[0]
 								}`,
-						  ));
+							);
+					}
 				})
 				.catch((e) => {
-					data.res.status(200).send(e.html);
+					data.res.status(500).send(e.html);
 				});
 			return;
 		} else if (view.type === "modular") {
-			self.pao.pa_wiLog("rENDEING MODULAR VIEW");
-			// self.infoSync(view.view)
 			data.res.status(200).send(view.view);
 			return self.infoSync(
 				`SERVER HAS SUCCESSFULLY SENT RESPONSE TO CLIENT WITH RESPONSE ID::${
@@ -152,7 +94,6 @@ export const handleWriteServerRequestResponse = async function (data) {
 				}`,
 			);
 		}
-		// self.streamResponse(data)
 	} else {
 		data.R_ID
 			? self.infoSync(
@@ -168,67 +109,41 @@ export const handleWriteServerRequestResponse = async function (data) {
 		if (data.data.accepts) {
 			switch (data.data.accepts) {
 				case "json":
-					data.res.status(data.data.code).send(data.data);
+					data.res.status(200).send(data.data);
 					break;
 				case "html":
-					if (data.data.sendFile) {
-						console.log("Request should sendFILE", data.data);
-						return data.res
-							.status(data.data.code)
-							.sendFile(data.data.fileSource);
-					}
 					self
 						.getHtml(data.res, {
 							view: "main/404",
 							title: "Page could not be found",
 						})
 						.then((html) => {
-							console.log("THE HTML BEING SENT");
-							return data.res.status(data.data.code).send(
-								self.getHtmlSkeleton(html.html, {
-									title: "Page could not be found",
-								}),
-							);
+							return data.res.status(400).send(html.html);
 						})
 						.catch((e) => {
-							return data.res.status(data.data.code).send(
-								self.getHtmlSkeleton(
-									"<h1>404 Resource could not be found</h1>",
-									{
-										title: "Page Could not be found",
-									},
-								),
-							);
+							return data.res.status(500).send(e.html);
 						});
 					break;
 				default:
-					data.res.type("txt").status(200).send("Text not found");
+					data.res.type("txt").status(400).send("Text not found");
 			}
 		} else {
 			data.res.status(200).send(data.data);
 		}
 		// await data.res.end()
-		// // self.pao.pa_wiLog(data.data)
+		// // self.debug(data.data)
 		return await self.log("SERVER HAS SENT A RESPONSE BACK TO CLIENT");
 	}
 };
 export const streamResponse = function (data) {
 	const self = this;
 	const pao = self.pao;
-	// const jsonToJs = pao.pa_jsonToJs
-	// let data = jsonToJs(dt)
-	// self.pao.pa_wiLog('THE STREAM IS RUNNING')
-	// self.pao.pa_wiLog(data)
 	const type = self.mimeTypes[data.data.ext];
 	let rStream = data.data.rStream;
 	const withAttachment = data.data.withAttachment || null;
 	if (withAttachment) data.res["withAttachment"] = { ...withAttachment };
-	// self.infoSync('Server is processing stream')
-	// self.infoSync(rStream)
-	// self.infoSync(data)
+
 	rStream.on("open", async function () {
-		// self.pao.pa_wiLog('INSIDE ON AND PIPING')
-		// self.pao.pa_wiLog(type)
 		self.infoSync("THE STREAM IS OPENED");
 		data.res.set("Content-Type", type);
 		data.res.set("Connection", "close");
@@ -245,27 +160,24 @@ export const streamResponse = function (data) {
 		);
 	});
 	rStream.on("error", async function (e) {
-		self.pao.pa_wiLog("THE ERROR READSTREAM");
-		self.pao.pa_wiLog(e);
 		data.res.set("Content-Type", "application/json");
 		data.res.set("Connection", "close");
 		return data.res.status(404).send({ error: true, message: "Not found" });
-		// data.res.end();
+
 		// return  await self.log('SERVER HAS SENT A STREAM RESPONSE BACK TO THE CLIENT WITH ERROR')
 	});
 };
 export const getHtml = function (res, view) {
-	const self = this;
-	const pao = self.pao;
-	self.pao.pa_wiLog("THE SET VIEW");
-	self.pao.pa_wiLog(view);
 	return new Promise((resolve, reject) => {
 		let viewda = null;
-		view.viewData ? (viewda = view.viewData) : (viewda = { title: view.title });
+		let serviceUrl = process.env.ANZII_APP_URL;
+
+		view?.viewData
+			? (viewda = { ...view.viewData, serviceUrl })
+			: (viewda = { title: view.title, serviceUrl });
+
 		res.render(view.view, viewda, (err, html) => {
 			if (err) {
-				self.pao.pa_wiLog("THE ERROR BELOW OCCURED TRYING TO RENDER VIEW");
-				self.pao.pa_wiLog(err);
 				res.render("main/500", { title: "Server error" }, (err, html) => {
 					if (err)
 						return resolve({
@@ -274,11 +186,8 @@ export const getHtml = function (res, view) {
 						});
 					return resolve({ html: html, success: true });
 				});
-				//   data.res.status(404).send({error: true, message: 'The requested view was not found'})
-				//   return self.pao.pa_wiLog('SERVER HAS SENT A FAILED RESPONSE BACK TO THE CLIENT::REGULAR')
 			} else {
 				return resolve({ html: html, success: true });
-				// return self.pao.pa_wiLog('SERVER HAS SENT A SUCCESSFULL RESPONSE BACK TO THE CLIENT::REGULAR')
 			}
 		});
 	});
@@ -298,8 +207,7 @@ export const getHtmlSkeleton = function (html, head = null, scripts = []) {
     </head>
 		<body>
 			<div id="root">${html}</div>
-			
-
+		
 		</body>
 		</html>
     `;

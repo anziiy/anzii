@@ -1,0 +1,7 @@
+{
+	"action": "generate-rsa",
+	"options": {
+		"outputPath": "/Users/surprisemashele/Documents/generated-key.pem",
+		"keyBitsLength": 2048
+	}
+}

@@ -2,7 +2,7 @@ import path from "path";
 import runNpmScript from "./runNpmScript.js";
 
 describe("Test shell scripting semulation", () => {
-	test("Should create webpack assets successfully for a give package", async () => {
+	test("Should create webpack assets successfully for a given package", async () => {
 		expect(
 			await runNpmScript(
 				"run",

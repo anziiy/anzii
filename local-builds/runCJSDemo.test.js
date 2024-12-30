@@ -14,5 +14,5 @@ describe("Test CJS-DEMO Runs", () => {
 				process.cwd(),
 			),
 		).toBeTruthy();
-	}, 60000);
+	}, 6000);
 });
